@@ -1,0 +1,12 @@
+{
+    "Actor": {
+        "types": [
+            "character"
+        ],
+        "htmlFields": []
+    },
+    "Item": {
+        "types": [],
+        "htmlFields": []
+    }
+}
