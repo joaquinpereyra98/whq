@@ -1,7 +1,15 @@
 /**
- * Extend the base Actor document by defining a custom roll data structure which is ideal for the Simple system.
+ * Extend the base Actor.
  * @extends {Actor}
  */
 export class WHQActor extends Actor {
-
+  getRollData() {
+    const system = this.system;
+    const data = {
+      ...super.getRollData(),
+      ...system.getRollData(),
+      name: this.name,
+      flags: this.flags,
+    };
+  }
 }

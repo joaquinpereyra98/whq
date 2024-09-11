@@ -1,2 +1,2 @@
 // Export Actors
-export { default as WHQCharacter } from './character.mjs';
+export { default as characterModel } from './character.mjs';

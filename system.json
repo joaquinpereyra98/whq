@@ -24,8 +24,8 @@
   "media": [
     {
       "type": "setup",
-      "url": "systems/warhammerquest/assets/logos/whqlogo.png",
-      "thumbnail": "systems/warhammerquest/assets/logos/whqlogo.png"
+      "url": "systems/whq/assets/logos/whqlogo.png",
+      "thumbnail": "systems/whq/assets/logos/whqlogo.png"
     }
   ],
   "version": "3.0.0",
@@ -47,7 +47,7 @@
   "socket": false,
   "manifest": "",
   "download": "",
-  "background": "systems/warhammerquest/assets/logos/whqlogo.png",
+  "background": "systems/whq/assets/logos/whqlogo.png",
   "grid": {
     "type": 1,
     "distance": 1,
