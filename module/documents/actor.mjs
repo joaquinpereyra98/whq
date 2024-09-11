@@ -11,5 +11,6 @@ export class WHQActor extends Actor {
       name: this.name,
       flags: this.flags,
     };
+    return data;
   }
 }
