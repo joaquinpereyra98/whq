@@ -1,3 +1,33 @@
 {
-    
+    "TYPES": {
+        "Actor": {
+            "elf": "Elf Fighter"
+        }
+    },
+    "WHQ": {
+        "TABS": {
+            "ACTORS": {
+                "Summary": "Summary"
+            }
+        },
+        "Attributes": {
+            "Pin": "Pin",
+            "PinAbrr": "Pin",
+            "Strength": "Strength",
+            "StrengthAbrr": "S",
+            "Toughness": "Toughness",
+            "ToughnessAbrr": "T",
+            "Willpower": "Willpower",
+            "WillpowerAbrr": "Will",
+            "WeaponSkill": "Weapon Skill",
+            "WeaponSkillAbrr": "WS",
+            "BallisticSkill": "Ballistic Skill",
+            "BallisticSkillAbrr": "BS"
+        },
+        "Wounds": "Wounds",
+        "Luck": "Luck",
+        "Movement": "Movement",
+        "Initiative": "Initiative",
+        "Attacks": "Attacks"
+    }
 }

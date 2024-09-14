@@ -13,4 +13,11 @@ export class WHQActor extends Actor {
     };
     return data;
   }
+
+  async rollAttribute(attrKey){
+    const attribute = this.system.attributes[attrKey];
+    const r = await Roll.create(`1d6 + ${attribute}`).evaluate()
+    const flavor =`${game.i18n.localize(CONFIG.WHQ.attributes[attrKey].name)} Attribute Roll`
+    await r.toMessage({flavor});
+  }
 }

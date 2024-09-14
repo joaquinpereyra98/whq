@@ -1,3 +1,4 @@
+import { defineIntegerField, defineBarField } from "./common.mjs";
 /**
  * @typedef {Object} CharacterSchema
  *
@@ -36,91 +37,37 @@ export default class WHQCharacter extends foundry.abstract.TypeDataModel {
    */
   static defineSchema() {
     const { SchemaField, NumberField } = foundry.data.fields;
-    const requiredInteger = (initial = 0) => ({
-      required: true,
-      nullable: false,
-      integer: true,
-      initial,
-    });
+
     return {
-      // Skills
-      skills: new SchemaField({
-        ballistic: new NumberField({
-          ...requiredInteger(),
-        }),
-        weapon: new NumberField({
-          ...requiredInteger(),
-        }),
-      }),
-
       // Wounds
-      wounds: new SchemaField({
-        max: new NumberField({
-          ...requiredInteger(null),
-          nullable: true,
-          min: 0,
-        }),
-        value: new NumberField({
-          ...requiredInteger(),
-          min: 0,
-        }),
-      }),
-
-      // Movement
-      move: new NumberField({
-        ...requiredInteger(),
-        min: 0,
-      }),
+      wounds: defineBarField(),
 
       // Luck
-      luck: new SchemaField({
-        max: new NumberField({
-          ...requiredInteger(0),
-          nullable: true,
-          min: 0,
-        }),
-        value: new NumberField({
-          ...requiredInteger(0),
-          min: 0,
-        }),
-      }),
+      luck: defineBarField(0, 0),
+
+      // Movement
+      move: defineIntegerField(),
 
       // Initiative
-      initiative: new NumberField({
-        ...requiredInteger(),
-      }),
+      initiative: defineIntegerField(),
+
+      //Attacks
+      attacks: defineIntegerField(),
 
       // Attributes
       attributes: new SchemaField({
-        attacks: new NumberField({
-          ...requiredInteger(),
-        }),
-        pin: new NumberField({
-          ...requiredInteger(),
-      }),
-      }),
-      attributes: new SchemaField({
-        }),
-      attributes: new SchemaField({
-        strength: new NumberField({
-          ...requiredInteger(),
-        }),
-        toughness: new NumberField({
-          ...requiredInteger(),
-        }),
-        willpower: new NumberField({
-          ...requiredInteger(),
-        }),
+        pin: defineIntegerField(),
+        strength: defineIntegerField(),
+        toughness: defineIntegerField(),
+        willpower: defineIntegerField(),
+        weaponSkill: defineIntegerField(),
+        ballisticSkill: defineIntegerField(),
       }),
 
       // Details
       details: new SchemaField({
-        golds: new NumberField({
-          ...requiredInteger(),
-        }),
-        level: new NumberField({
-          ...requiredInteger(1),
-        }),
+        golds: defineIntegerField(),
+        level: defineIntegerField(1),
       }),
     };
   }
@@ -131,25 +78,26 @@ export default class WHQCharacter extends foundry.abstract.TypeDataModel {
    * @param {string} userId - The id of the User requesting the document update
    */
   _preCreate(data, options, userId) {
-      const system = data.system ?? {};
-      const actorType = this.parent.type;
-      const initialValues = CONFIG.WHQ.actors[actorType].initialValues ?? {};
-      foundry.utils.mergeObject(system, initialValues, {overwrite: false})
-      this.parent.updateSource({ system });
+    const system = data.system ?? {};
+    const actorType = this.parent.type;
+    const initialValues = CONFIG.WHQ.actors[actorType].initialValues ?? {};
+    foundry.utils.mergeObject(system, initialValues, { overwrite: false });
+    this.parent.updateSource({ system });
   }
 
-  prepareBaseData(){
+  prepareBaseData() {
     const level = this.details.level;
 
-    function getTitleByLevel(level) {
+    function getTitleByLevel(level) {  
+
       if (level === 1) return "novice";
-      if (level <= 4) return "champion";
-      if (level <= 8) return "hero";
-      if (level <= 10) return "lord";
-      return undefined;
+      else if (level <= 4) return "champion";
+      else if (level <= 8) return "hero";
+      else if (level <= 10) return "lord";
+      else return undefined;
     }
-    
-    this.details.title = getTitleByLevel(level)
+
+    this.details.title = getTitleByLevel(level);
   }
   /**
    * Prepare a data object which defines the data schema used by dice roll commands against this Actor.

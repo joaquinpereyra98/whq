@@ -1,0 +1,40 @@
+.wqh-sheet .window-content .sheet-header {
+    justify-content: center;
+}
+.wqh-sheet .window-content .sheet-header img.profile-img {
+    flex: 1;
+    height: 100%;
+}
+.wqh-sheet .window-content .sheet-header .header-fields {
+    flex: 4;
+}
+.wqh-sheet .attributes-inputs .attribute-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 3px;
+    border-width: 2px;
+}
+.wqh-sheet .attributes-inputs .attribute-container .input-bar-value {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.wqh-sheet .attributes-inputs .attribute-container .input-bar-max{
+    border-left: 2px solid;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+.wqh-sheet .name-container input {
+    margin: 8px
+}
+.wqh-sheet .name-container .name-input {
+    flex: 3
+}
+.wqh-sheet .name-container .level-input {
+    flex: 1;
+    text-align: center;
+}
+.wqh-sheet .flex-container {
+    display: flex;
+}
