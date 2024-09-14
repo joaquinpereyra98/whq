@@ -3,7 +3,10 @@
     <div class='header-fields'>
         <div class='name-container flex-container'>
             <input class="name-input" name='name' type='text' value='{{actor.name}}' placeholder='Name' />
-            <input class="level-input" type="number" name="system.details.level" value="{{actor.system.details.level}}">
+            <div class="level-container">
+                <input class="level-input" type="number" name="system.details.level" value="{{actor.system.details.level}}">
+                <label>Level</label>
+            </div>
         </div>
         <div class="attributes-inputs flex-container">
             <div class="attribute-container">
@@ -24,16 +27,18 @@
                 <label>{{localize 'WHQ.Move'}}</label>
                 <input type="number" name="system.move" value="{{system.move}}">
             </div>
-            <div class="attribute-container">
-                <label>{{localize 'WHQ.Luck'}}</label>
-                <div class="flex-container">
-                    <input class="input-bar-value" type="number" name="system.luck" value="{{system.luck.value}}">
-                    <input class="input-bar-max" type="number" name="system.luck.max" value="{{system.luck.max}}">
-                </div>
-            </div>
             <div class="attribute-container ">
                 <label>{{localize 'WHQ.Initiative'}}</label>
                 <input type="number" name="system.initiative" value="{{system.initiative}}">
+            </div>
+            <div class="attribute-container">
+                <div class="flex-container">
+                    <label>{{localize 'WHQ.Luck'}}</label>
+                </div>
+                <div class="flex-container">
+                    <input class="input-bar-value" type="number" name="system.luck.value" value="{{system.luck.value}}">
+                    <input class="input-bar-max" type="number" name="system.luck.max" value="{{system.luck.max}}">
+                </div>
             </div>
             <div class="attribute-container">
                 <label>{{localize 'WHQ.Attacks'}}</label>
