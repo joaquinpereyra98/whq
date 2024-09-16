@@ -1,4 +1,5 @@
-const { SchemaField, NumberField } = foundry.data.fields;
+const { SchemaField, NumberField, ArrayField, StringField } =
+  foundry.data.fields;
 /**
  * Create a new instance of Number Field integer and required
  * @param {Number} initial - initial value, default 0
@@ -6,12 +7,35 @@ const { SchemaField, NumberField } = foundry.data.fields;
  *
  * @returns { import("../../foundry/common/data/fields.mjs").NumberField }
  */
-export function defineIntegerField(initial = 0, nullable = false) {
-  return new NumberField({
-    required: true,
-    integer: true,
-    nullable,
-    initial,
+export function defineAttributeField(initial = 0, nullable = false) {
+  return new SchemaField({
+    value: new NumberField({
+      required: true,
+      integer: true,
+      nullable,
+      initial,
+    }),
+    mods: new ArrayField(
+      new SchemaField({
+        value: new NumberField({
+          integer: true,
+        }),
+        label: new StringField({
+          trim: true,
+          textSearch: false,
+        }),
+      }),
+      {
+        initial: [],
+        nullable: false,
+        required: true,
+      }
+    ),
+    modifier: new NumberField({
+      required: false,
+      integer: true,
+      initial: 0
+    })
   });
 }
 /**

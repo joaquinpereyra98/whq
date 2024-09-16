@@ -1,40 +1,211 @@
-.wqh-sheet .window-content .sheet-header {
-    justify-content: center;
+/*============================ FONTS ============================*/
+/* @font-face definitions for custom fonts used in the module. */
+
+@font-face {
+    font-family: 'Cas Antn';
+    src: url('../assets/fonts/CAS_ANTN.TTF');
 }
-.wqh-sheet .window-content .sheet-header img.profile-img {
-    flex: 1;
-    height: 100%;
+
+@font-face {
+    font-family: 'Newtext Rg BT Regular';
+    src: url('../assets/fonts/Newtext-Rg-BT-Regular.ttf');
 }
-.wqh-sheet .window-content .sheet-header .header-fields {
-    flex: 4;
+
+/*====================== GENERAL USER INTERFACE ==================*/
+
+.whq {
+    --whq-font-input: 'Cas Antn';
+    --whq-font-label: 'Newtext Rg BT Regular';
 }
-.wqh-sheet .attributes-inputs .attribute-container {
+
+.whq .flex-col {
     display: flex;
     flex-direction: column;
     align-items: center;
-    text-align: center;
-    padding: 3px;
-    border-width: 2px;
 }
-.wqh-sheet .attributes-inputs .attribute-container .input-bar-value {
+
+.whq .flex-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.whq .flex-1 {
+    flex: 1;
+}
+
+.whq .flex-2 {
+    flex: 2;
+}
+
+.whq .flex-3 {
+    flex: 3;
+}
+
+.whq .flex-4 {
+    flex: 4;
+}
+
+.whq .flex-5 {
+    flex: 5;
+}
+
+.whq .flex-6 {
+    flex: 6;
+}
+
+.whq .flex-7 {
+    flex: 7;
+}
+
+.whq .flex-8 {
+    flex: 8;
+}
+
+.whq .flex-9 {
+    flex: 9;
+}
+
+.whq .flex-10 {
+    flex: 10;
+}
+
+/*=========================== GENERAL ELEMENTS ============================*/
+
+.whq.whq-sheet .window-content {
+    overflow-y: auto;
+}
+.whq label.whq-label {
+    margin: 5px 7px;
+    font-family: var(--whq-font-label);
+    font-size: large;
+}
+
+.whq.whq-sheet .resource-bar .bar-input-value {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
 }
-.wqh-sheet .attributes-inputs .attribute-container .input-bar-max{
-    border-left: 2px solid;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
+
+.whq.whq-sheet .resource-bar .bar-input-value {
+    position: relative;
+    clip-path: polygon(0 0, 100% 0%, 90% 100%, 0 100%);
+    margin-right: -1px;
 }
-.wqh-sheet .name-container input {
-    margin: 8px
+
+.whq.whq-sheet .resource-bar .bar-input-max {
+    position: relative;
+    clip-path: polygon(10% 0%, 100% 0%, 100% 100%, 0% 100%);
+    margin-left: -1px;
 }
-.wqh-sheet .name-container .name-input {
-    flex: 3
+
+/*========================= SHEET HEADER =========================*/
+
+.whq .sheet-header {
+    margin-bottom: 5px;
 }
-.wqh-sheet .name-container .level-input {
-    flex: 1;
+
+.whq .sheet-header .profile-img {
+    height: 100%;
+    border-radius: 4px;
+    margin-bottom: 7px;
+}
+
+.whq .sheet-header .header-fields {
+    flex: 2;
+}
+
+.whq .sheet-header .header-fields .flex-row {
+    margin-bottom: 5px;
+}
+
+.whq .sheet-header .header-fields .title-container,
+.whq .sheet-header .header-fields .level-container,
+.whq .sheet-header .header-fields .name-container {
+    border: 2px solid;
+    border-radius: 4px;
+    margin: 0 2px;
+}
+
+.whq .sheet-header .header-fields input {
+    border: 0;
+    font-family: var(--whq-font-input);
+    font-size: large;
+}
+
+.whq .sheet-header .header-fields input[type="number"],
+.whq .attribute-container input[type="number"] {
     text-align: center;
 }
-.wqh-sheet .flex-container {
-    display: flex;
+
+.whq .sheet-header .wounds-container ,
+.whq .sheet-header .init-container,
+.whq .sheet-header .gold-container {
+    border: 2px solid;
+    border-radius: 4px;
+    margin: 0 3px;
+}
+
+.whq .sheet-header .wounds-container .wounds-bar {
+    margin: 0;
+}
+.whq .sheet-header .header-resources {
+    margin: 5px 0;
+}
+.whq .sheet-header .header-resources .whq-label {
+    font-size: 18px;
+}
+.whq .sheet-header .conditions-container {
+    height: 98%;
+    border: 2px solid;
+    border-radius: 4px;
+    margin: 0 4px;
+    margin-bottom: 1%;
+}
+.whq .sheet-header .conditions-container .whq-label {
+    width: 100%;
+    text-align: center;
+    border-bottom: 2px solid;
+    padding-bottom: 5px;
+}
+
+/*========================= ATTRIBUTES PART =========================*/
+
+.whq .attributes-fields .attribute-container {
+    border: 2px solid;
+    border-radius: 4px;
+    margin: 0 2px;
+    min-width: 2em;
+}
+.whq .attributes-fields .attribute-container input {
+    border-radius: 0;
+    font-family: var(--whq-font-input);
+    font-size: 20px;
+    font-weight: bold;
+}
+.whq .attributes-fields .attribute-container .attribute-mod-input {
+    border-top: 2px solid;
+}
+
+/*========================= EQUIPAMENT PART =========================*/
+
+.whq .sheet-container {
+    margin: 10px 0; 
+}
+
+/*========================= EQUIPAMENT PART =========================*/
+.whq .sheet-container .equipament-card {
+    width: 30%;
+    margin: 5px;
+    border: 2px solid;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+/*========================= BODY SHEET =========================*/
+.whq .sheet-body {
+    width: 70%;
+    align-items: normal;
+    height: 100%;
+    padding: 5px 0;
+    margin-top: 5px;
 }

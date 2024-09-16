@@ -1,4 +1,4 @@
-import { defineIntegerField, defineBarField } from "./common.mjs";
+import { defineAttributeField, defineBarField } from "./common.mjs";
 /**
  * @typedef {Object} CharacterSchema
  *
@@ -42,32 +42,39 @@ export default class WHQCharacter extends foundry.abstract.TypeDataModel {
       // Wounds
       wounds: defineBarField(),
 
-      // Luck
-      luck: defineBarField(0, 0),
+      initiative: new NumberField({
+        required: true,
+        integer: true,
+        nullable: false,
+        initial: 0,
+      }),
 
-      // Movement
-      move: defineIntegerField(),
-
-      // Initiative
-      initiative: defineIntegerField(),
-
-      //Attacks
-      attacks: defineIntegerField(),
-
-      // Attributes
       attributes: new SchemaField({
-        pin: defineIntegerField(),
-        strength: defineIntegerField(),
-        toughness: defineIntegerField(),
-        willpower: defineIntegerField(),
-        weaponSkill: defineIntegerField(),
-        ballisticSkill: defineIntegerField(),
+        move: defineAttributeField(4),
+        weaponSkill: defineAttributeField(),
+        ballisticSkill: defineAttributeField(),
+        strength: defineAttributeField(),
+        toughness: defineAttributeField(),
+        attacks: defineAttributeField(1),
+        pin: defineAttributeField(),
+        willpower: defineAttributeField(),
+        luck: defineAttributeField(),
       }),
 
       // Details
       details: new SchemaField({
-        golds: defineIntegerField(),
-        level: defineIntegerField(1),
+        gold: new NumberField({
+          required: true,
+          integer: true,
+          nullable: false,
+          initial: 0,
+        }),
+        level: new NumberField({
+          required: true,
+          integer: true,
+          nullable: false,
+          initial: 0,
+        }),
       }),
     };
   }
@@ -88,23 +95,33 @@ export default class WHQCharacter extends foundry.abstract.TypeDataModel {
   prepareBaseData() {
     const level = this.details.level;
 
-    function getTitleByLevel(level) {  
-
-      if (level === 1) return "novice";
-      else if (level <= 4) return "champion";
-      else if (level <= 8) return "hero";
-      else if (level <= 10) return "lord";
+    function getTitleByLevel(level) {
+      if (level === 1) return "Novice";
+      else if (level <= 4) return "Champion";
+      else if (level <= 8) return "Hero";
+      else if (level <= 10) return "Lord";
       else return undefined;
     }
 
     this.details.title = getTitleByLevel(level);
   }
+
+  prepareDerivedData() {
+    Object.values(this.attributes).forEach(attr => {
+      attr.total = attr.value + attr.modifier + attr.mods.reduce((sum, { value, mod }) => 
+        typeof value === 'number' ? sum + value + mod : sum, 0);
+    });    
+  }
+
   /**
    * Prepare a data object which defines the data schema used by dice roll commands against this Actor.
    * @returns {object}
    */
   getRollData() {
     const data = foundry.utils.deepClone(this);
+    Object.keys(this.attributes).forEach(attrKey => {
+      data[attrKey] = this.attributes[attrKey].total;
+    })
     return data;
   }
 }

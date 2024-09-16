@@ -16,15 +16,15 @@ export class WHQActorSheet extends api.HandlebarsApplicationMixin(
 
   /** @inheritDoc */
   static DEFAULT_OPTIONS = {
-    classes: ["whq", "wqh-sheet", "actor"],
-    position: { width: 600, height: 600 },
+    classes: ["whq", "whq-sheet", "actor"],
+    position: { width: 800, height: 600 },
     actions: {
+      onEditImage: this._onEditImage,
       roll: this._onRoll,
       initWounds: this._onInitWounds,
-      toggleMode: this._onChangeSheetMode,
     },
     form: { submitOnChange: true },
-    windows: {
+    window: {
       resizable: true,
       icon: "fa-solid fa-user",
     },
@@ -32,20 +32,29 @@ export class WHQActorSheet extends api.HandlebarsApplicationMixin(
 
   /** @override */
   static PARTS = {
-    headers: {
-      template: `${CONSTANT.systemPath(
-        "templates/actor-sheet/header-part.hbs"
-      )}`,
+    //Header
+    header: {
+      template: CONSTANT.actorParts("header-part.hbs"),
     },
+    //Attributes Fields
+    attributes: {
+      template: CONSTANT.actorParts("attributes-part.hbs"),
+    },
+    //Equipament Section
+    equipament: {
+      template: CONSTANT.actorParts("equipament-part.hbs"),
+    },
+    //Nav Bar
     tabs: {
       // Foundry-provided generic template
-      template: "templates/generic/tab-navigation.hbs"
+      template: "templates/generic/tab-navigation.hbs",
+      classes: ["body-part"],
     },
-    summary: {
-      template: `${CONSTANT.systemPath(
-        "templates/actor-sheet/summary-part.hbs"
-      )}`
-    }
+    //Summary Tab
+    weapons: {
+      template: CONSTANT.actorParts("weapons-part.hbs"),
+      classes: ["body-part"],
+    },
   };
 
   /**
@@ -85,29 +94,6 @@ export class WHQActorSheet extends api.HandlebarsApplicationMixin(
   };
 
   /**
-   * The mode the sheet is currently in.
-   * @type {WHQActorSheet.MODES}
-   * @protected
-   */
-  _mode = this.constructor.MODES.PLAY;
-
-  /**
-   * ---------------------------------------
-   * 3. State & Mode Checking
-   * ---------------------------------------
-   */
-
-  // Check if the sheet is in Play mode
-  get isPlayMode() {
-    return this._mode === this.constructor.MODES.PLAY;
-  }
-
-  // Check if the sheet is in Edit mode
-  get isEditMode() {
-    return this._mode === this.constructor.MODES.EDIT;
-  }
-
-  /**
    * ---------------------------------------
    * 4. Rendering & Context Preparation
    * ---------------------------------------
@@ -122,7 +108,6 @@ export class WHQActorSheet extends api.HandlebarsApplicationMixin(
    */
   async _prepareContext(options) {
     const context = {
-      isPlayMode: this.isPlayMode,
       editable: this.isEditable,
       owner: this.document.isOwner,
       limited: this.document.limited,
@@ -130,7 +115,7 @@ export class WHQActorSheet extends api.HandlebarsApplicationMixin(
       system: this.actor.system,
       flags: this.actor.flags,
       config: CONFIG.WHQ,
-      tabs: this._getTabs()
+      tabs: this._getTabs(),
     };
 
     this._prepareAttributes(context);
@@ -141,13 +126,11 @@ export class WHQActorSheet extends api.HandlebarsApplicationMixin(
    * @param {import("../../foundry/client-esm/applications/_types.mjs").ApplicationRenderContext} context - Shared context provided by _prepareContext.
    */
   _prepareAttributes(context) {
-    const attributes = this.actor.system.attributes;
-    context.attributes = Object.keys(attributes).map((key) => ({
-      label: CONFIG.WHQ.attributes[key].abrr,
-      path: `system.attributes.${key}`,
-      key,
-      value: attributes[key],
-    }));
+    context.attributes = foundry.utils.duplicate(this.actor.system.attributes);
+    for (const attribute in context.attributes) {
+      context.attributes[attribute].label =
+        CONFIG.WHQ.attributes[attribute].label;
+    }
   }
   /**
    * Prepare context that is specific to only a single rendered part.
@@ -159,8 +142,10 @@ export class WHQActorSheet extends api.HandlebarsApplicationMixin(
   async _preparePartContext(partId, context) {
     switch (partId) {
       case "summary":
-        context.tab = context.tabs.summary
+        context.tab = context.tabs.summary;
         break;
+      case "equipament":
+        context.slh = CONFIG.WHQ.silhouette;
       default:
         break;
     }
@@ -188,6 +173,37 @@ export class WHQActorSheet extends api.HandlebarsApplicationMixin(
     );
     return tabs;
   }
+  /**
+   *
+   * @param {*} context
+   * @param {*} options
+   */
+  _onFirstRender(context, options) {
+    super._onFirstRender(context, options);
+  
+    // Helper function to create and insert a container with elements
+    const createAndInsertContainer = (classList, selector, insertAfterSelector) => {
+      const container = document.createElement("div");
+      container.classList.add(...classList);
+      container.replaceChildren(...this.element.querySelectorAll(selector));
+      this.element.querySelector(insertAfterSelector).insertAdjacentElement("afterend", container);
+    };
+  
+    // Create and insert sheet container for equipament cards
+    createAndInsertContainer(
+      ["sheet-container", "flex-row"], 
+      '.equipament-card[data-application-part="equipament"]', 
+      ".sheet-attributes"
+    );
+  
+    // Create and insert sheet body for body parts
+    createAndInsertContainer(
+      ["sheet-body", "flex-col"], 
+      ".body-part", 
+      ".equipament-card"
+    );
+  }
+  
 
   /**
    * ---------------------------------------
@@ -195,6 +211,33 @@ export class WHQActorSheet extends api.HandlebarsApplicationMixin(
    * ---------------------------------------
    */
 
+  /**
+   * Handle changing a Document's image.
+   *
+   * @this DrawSteelActorSheet
+   * @param {PointerEvent} event   The originating click event
+   * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
+   * @returns {Promise}
+   * @protected
+   */
+  static async _onEditImage(event, target) {
+    const attr = target.dataset.edit;
+    const current = foundry.utils.getProperty(this.document, attr);
+    const { img } =
+      this.document.constructor.getDefaultArtwork?.(this.document.toObject()) ??
+      {};
+    const fp = new FilePicker({
+      current,
+      type: "image",
+      redirectToRoot: img ? [img] : [],
+      callback: (path) => {
+        this.document.update({ [attr]: path });
+      },
+      top: this.position.top + 40,
+      left: this.position.left + 10,
+    });
+    return fp.browse();
+  }
   /**
    *
    * @param {PointerEvent} event
@@ -221,24 +264,5 @@ export class WHQActorSheet extends api.HandlebarsApplicationMixin(
       "system.wounds.value": roll.total,
     });
     return roll.toMessage({ flavor: "Set initial Wounds" });
-  }
-
-  /**
-   * Handle the user toggling the sheet mode.
-   * @param {Event} event - The triggering event.
-   * @param {HTMLElement} target -
-   * @protected
-   */
-  static async _onChangeSheetMode(event, target) {
-    const { MODES } = this.constructor.MODES;
-
-    if (!this.isEditable) {
-      console.error("Cannot switch to Edit mode on an uneditable sheet");
-      return;
-    }
-
-    this._mode = this.isPlayMode ? MODES.EDIT : MODES.PLAY;
-
-    this.render();
   }
 }

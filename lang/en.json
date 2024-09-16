@@ -28,6 +28,7 @@
         "Luck": "Luck",
         "Movement": "Movement",
         "Initiative": "Initiative",
-        "Attacks": "Attacks"
+        "Attacks": "Attacks",
+        "Move": "Move"
     }
 }

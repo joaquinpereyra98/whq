@@ -1,0 +1,14 @@
+<div class="sheet-attributes">
+    <div class="attributes-fields flex-row">
+        {{#each attributes as |attribute key|}}
+            <div class="attribute-container flex-col {{key}}-field">
+                <label class="whq-label">{{attribute.label}}</label>
+                <div class="attribute-values flex-row">
+                    <input type="number" name="system.attributes.{{key}}.value" value="{{attribute.value}}">
+                    <input type="number" name="system.attributes.{{key}}.total" value="{{attribute.total}}" disabled>
+                </div>
+                <input class="attribute-mod-input" type="number" name="system.attributes.{{key}}.modifier" value="{{attribute.modifier}}">
+            </div>
+        {{/each}}
+    </div>
+</div>

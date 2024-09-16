@@ -1,50 +1,64 @@
-const WHQ = {};
-/**
- * @typedef {Object} ActorConfig
- * @property {string} woundsRoll             - Wounds roll formula.
- * @property {boolean} autopining            - Auto-pinning setting.
- * @property {CharacterData} initialValues - Initial values of the actor.
- */
+import CONSTANT from "./constants.mjs";
 
-/**
- * @type {{ elf: ActorConfig }}
- */
+const WHQ = {};
 
 WHQ.actors = {
   elf: {
     woundsRoll: "1d6 + 7",
     autopining: true,
     initialValues: {
-      move: 4,
       initiative: 6,
-      attacks: 1,
       attributes: {
-        pin: 0,
-        strength: 3,
-        toughness: 3,
-        willpower: 2,
-        weaponSkill: 4,
-        ballisticSkill: 4,
+        weaponSkill:{value: 4} ,
+        ballisticSkill:{value: 4} ,
+        strength:{value: 3} ,
+        toughness:{value: 3} ,
+        willpower:{value: 2} ,
+        pin:{value: 0} ,
       },
     },
   },
 };
 
-WHQ.attributes = Object.fromEntries(
-  [
-    "pin",
-    "strength",
-    "toughness",
-    "willpower",
-    "weaponSkill",
-    "ballisticSkill",
-  ].map((key) => [
-    key,
-    {
-      name: `WHQ.Attributes.${key.capitalize()}`,
-      abrr: `WHQ.Attributes.${key.capitalize()}Abrr`,
+WHQ.attributes = {
+    move: {
+      name: "Move",
+      label: "Move"
     },
-  ])
-);
+    weaponSkill: {
+      name: "Weapon Skill",
+      label: "WS"
+    },
+    ballisticSkill: {
+      name: "Ballistic Skill",
+      label: "BS"
+    },
+    strength: {
+      name: "Strength",
+      label: "S"
+    },
+    toughness: {
+      name: "Toughness",
+      label: "T"
+    },
+    attacks: {
+      name: "Attacks",
+      label: "Atks"
+    },
+    pin: {
+      name: "Pinning",
+      label: "Pin"
+    },
+    willpower: {
+      name: "Willpower",
+      label: "WP"
+    },
+    luck: {
+      name: "Luck",
+      label: "Luck"
+    }
+  }
+  
+WHQ.silhouette = `${CONSTANT.systemPath("assets/ui/silhouette_character.png")}`;
 
 export default WHQ;
