@@ -137,9 +137,7 @@
     text-align: center;
 }
 
-.whq .sheet-header .wounds-container ,
-.whq .sheet-header .init-container,
-.whq .sheet-header .gold-container {
+.whq .sheet-header .resource-container {
     border: 2px solid;
     border-radius: 4px;
     margin: 0 3px;

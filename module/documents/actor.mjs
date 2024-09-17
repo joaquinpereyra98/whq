@@ -2,7 +2,7 @@
  * Extend the base Actor.
  * @extends {Actor}
  */
-export class WHQActor extends Actor {
+export default class WHQActor extends Actor {
   getRollData() {
     const system = this.system;
     const data = {

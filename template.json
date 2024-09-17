@@ -6,7 +6,9 @@
         "htmlFields": []
     },
     "Item": {
-        "types": [],
+        "types": [
+            "weapon"
+        ],
         "htmlFields": []
     }
 }

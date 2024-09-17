@@ -1,0 +1,37 @@
+<header class="sheet-header">
+    <img class='profile-img' src='{{item.img}}' data-edit="img" data-action="onEditImage" title='{{item.name}}'
+        height='100' width='100' />
+    <div class="header-fields">
+        <div class='name-container flex-row'>
+            <label class="whq-label">Name</label>
+            {{formInput
+            fields.name
+            name="name"
+            value=item.name
+            placeholder=(localize "Name")
+            }}
+        </div>
+        <div class="header-resources flex-row">
+            <div class="resource-container flex-col">
+                <label class="whq-label">Type Weapon</label>
+                {{formInput systemFields.type
+                value=item.system.type
+                placeholder="Weapon Type"
+                }}
+            </div>
+            <div class="resource-container flex-col">
+                <label class="whq-label">Price</label>
+                {{formInput systemFields.price
+                value=item.system.price
+                }}
+            </div>
+            {{#if item.parent}}
+            <div class="resource-container flex-col">
+                <label class="whq-label">Equipped</label>
+                {{formInput systemFields.equipped
+                value=item.system.equipped
+                }}
+            </div>
+            {{/if}}
+        </div>
+</header>

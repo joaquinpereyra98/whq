@@ -1,14 +1,22 @@
 {
     "TYPES": {
         "Actor": {
-            "elf": "Elf Fighter"
+            "elf": "Elf"
+        },
+        "Item": {
+            "weapon": "Weapon"
         }
     },
     "WHQ": {
         "TABS": {
             "ACTORS": {
                 "Summary": "Summary"
-            }
+            },
+            "ITEMS": {
+                "Details": "Details",
+                "Effects": "Effects"
+            },
+           "Description": "Description"
         },
         "Attributes": {
             "Pin": "Pin",
@@ -24,11 +32,16 @@
             "BallisticSkill": "Ballistic Skill",
             "BallisticSkillAbrr": "BS"
         },
+        "WeaponType": {
+            "Melee": "Melee Weapon",
+            "Range": "Ranged Weapon"
+        },
         "Wounds": "Wounds",
         "Luck": "Luck",
         "Movement": "Movement",
         "Initiative": "Initiative",
         "Attacks": "Attacks",
-        "Move": "Move"
+        "Move": "Move",
+        "Description": "Description"
     }
 }

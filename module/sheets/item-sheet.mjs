@@ -1,14 +1,10 @@
-import CONSTANT from "../constants.mjs";
+import CONSTANT from '../constants.mjs';
 const { api, sheets } = foundry.applications;
 
-/**
- * Extend ActorSheet with modifications for WHQ.
- * @extends {ActorSheetV2}
- */
-export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
-  sheets.ActorSheetV2
+export default class WHQItemSheet extends api.HandlebarsApplicationMixin(
+  sheets.ItemSheetV2
 ) {
-  /**
+      /**
    * ---------------------------------------
    * 1. Constructor & Static Defaults
    * ---------------------------------------
@@ -16,17 +12,15 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
 
   /** @inheritDoc */
   static DEFAULT_OPTIONS = {
-    classes: ["whq", "whq-sheet", "actor"],
+    classes: ["whq", "whq-sheet", "item"],
     position: { width: 800, height: 600 },
     actions: {
-      onEditImage: this._onEditImage,
-      roll: this._onRoll,
-      initWounds: this._onInitWounds,
+        onEditImage: this._onEditImage
     },
     form: { submitOnChange: true },
     window: {
       resizable: true,
-      icon: "fa-solid fa-user",
+      icon: "fas fa-suitcase",
     },
   };
 
@@ -34,54 +28,65 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
   static PARTS = {
     //Header
     header: {
-      template: CONSTANT.actorParts("header-part.hbs"),
+      template: CONSTANT.itemParts("header-part.hbs"),
     },
-    //Attributes Fields
-    attributes: {
-      template: CONSTANT.actorParts("attributes-part.hbs"),
-    },
-    //Equipament Section
-    equipament: {
-      template: CONSTANT.actorParts("equipament-part.hbs"),
-    },
-    //Nav Bar
-    tabs: {
+     //Nav Bar
+     tabs: {
       // Foundry-provided generic template
       template: "templates/generic/tab-navigation.hbs",
       classes: ["body-part"],
     },
-    //Summary Tab
-    weapons: {
-      template: CONSTANT.actorParts("weapons-part.hbs"),
-      classes: ["body-part"],
+    //Description Tab:
+    description: {
+      template: CONSTANT.itemParts("description.hbs")
     },
+    //Details Tab:
+    details: {
+      template: CONSTANT.itemParts("details.hbs")
+    },
+    //Effects Tab:
+    effects: {
+      template: CONSTANT.itemParts("effects.hbs")
+    }
   };
-
   /**
    * Available tabs for the sheet.
    * @type {Array<{id: string, group: string, icon: string, label: string}>}
    */
   static TABS = [
     {
-      id: "summary",
+      id: "description",
       group: "primary",
-      icon: "fa-solid fa-book-user",
-      label: "WHQ.TABS.ACTORS.Summary",
+      icon: "fa-solid fa-book",
+      label: "WHQ.TABS.Description",
+    },
+    {
+      id: "details",
+      group: "primary",
+      icon: "fa-solid fa-toolbox",
+      label: "WHQ.TABS.ITEMS.Details",
+    },
+    {
+      id: "effects",
+      group: "primary",
+      icon: "fa-solid fa-stars",
+      label: "WHQ.TABS.ITEMS.Effects",
     },
   ];
 
-  /**
+ /**
    * ---------------------------------------
    * 2. State Variables
    * ---------------------------------------
    */
+
   /**
    * Reports the active tab for each group.
    *  @type {Record<string, string>}
    *  @override
    */
   tabGroups = {
-    primary: "summary",
+    primary: "description",
   };
 
   /**
@@ -97,32 +102,27 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
    * @protected
    * @override
    */
+
   async _prepareContext(options) {
     const context = {
       editable: this.isEditable,
       owner: this.document.isOwner,
       limited: this.document.limited,
-      actor: this.actor,
-      system: this.actor.system,
-      flags: this.actor.flags,
+
+      item: this.item,
+      system: this.item.system,
+      flags: this.item.flags,
       config: CONFIG.WHQ,
+
+      fields: this.document.schema.fields,
+      systemFields: this.document.system.schema.fields,
+
       tabs: this._getTabs(),
     };
 
-    this._prepareAttributes(context);
-    context.isWoundInit = this.actor.system.wounds.max !== null;
     return context;
-  }
-  /**
-   * @param {import("../../foundry/client-esm/applications/_types.mjs").ApplicationRenderContext} context - Shared context provided by _prepareContext.
-   */
-  _prepareAttributes(context) {
-    context.attributes = foundry.utils.duplicate(this.actor.system.attributes);
-    for (const attribute in context.attributes) {
-      context.attributes[attribute].label =
-        CONFIG.WHQ.attributes[attribute].label;
-    }
-  }
+  };
+
   /**
    * Prepare context that is specific to only a single rendered part.
    *
@@ -132,23 +132,21 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
    */
   async _preparePartContext(partId, context) {
     switch (partId) {
-      case "summary":
-        context.tab = context.tabs.summary;
+      case "description":
+        context.tab = context.tabs.description;
         break;
-      case "equipament":
-        context.slh = CONFIG.WHQ.silhouette;
       default:
         break;
     }
     return context;
   }
 
-  /**
+   /**
    * Prepare an array of sheet tabs.
    * @this WHQActorSheet
    * @returns {Record<string, Partial<import("../../foundry/client-esm/applications/_types.mjs").ApplicationTab>>}
    */
-  _getTabs() {
+   _getTabs() {
     const tabs = Object.fromEntries(
       this.constructor.TABS.map((tab) => {
         const active = this.tabGroups[tab.group] === tab.id;
@@ -164,37 +162,6 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
     );
     return tabs;
   }
-  /**
-   *
-   * @param {*} context
-   * @param {*} options
-   */
-  _onFirstRender(context, options) {
-    super._onFirstRender(context, options);
-  
-    // Helper function to create and insert a container with elements
-    const createAndInsertContainer = (classList, selector, insertAfterSelector) => {
-      const container = document.createElement("div");
-      container.classList.add(...classList);
-      container.replaceChildren(...this.element.querySelectorAll(selector));
-      this.element.querySelector(insertAfterSelector).insertAdjacentElement("afterend", container);
-    };
-  
-    // Create and insert sheet container for equipament cards
-    createAndInsertContainer(
-      ["sheet-container", "flex-row"], 
-      '.equipament-card[data-application-part="equipament"]', 
-      ".sheet-attributes"
-    );
-  
-    // Create and insert sheet body for body parts
-    createAndInsertContainer(
-      ["sheet-body", "flex-col"], 
-      ".body-part", 
-      ".equipament-card"
-    );
-  }
-  
 
   /**
    * ---------------------------------------
@@ -229,31 +196,5 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
     });
     return fp.browse();
   }
-  /**
-   *
-   * @param {PointerEvent} event
-   * @param {HTMLElement} target
-   */
-  static async _onRoll(event, target) {
-    event.preventDefault();
-    const { rollType } = target.dataset;
-    if (rollType === "attribute") {
-      await this.actor.rollAttribute(target.dataset.attribute);
-    }
-  }
 
-  /**
-   *
-   * @param {PointerEvent} event
-   * @param {HTMLElement} target
-   */
-  static async _onInitWounds(event, target) {
-    const formula = CONFIG.WHQ.actors[this.actor.type].woundsRoll;
-    const roll = await Roll.create(formula).evaluate();
-    await this.actor.update({
-      "system.wounds.max": roll.total,
-      "system.wounds.value": roll.total,
-    });
-    return roll.toMessage({ flavor: "Set initial Wounds" });
-  }
 }

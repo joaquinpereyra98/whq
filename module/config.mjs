@@ -61,4 +61,9 @@ WHQ.attributes = {
   
 WHQ.silhouette = `${CONSTANT.systemPath("assets/ui/silhouette_character.png")}`;
 
+WHQ.weaponTypes = {
+  melee: "Melee Weapon",
+  ranged: "Ranged Weapon"
+}
+
 export default WHQ;

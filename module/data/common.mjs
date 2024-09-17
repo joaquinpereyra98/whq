@@ -34,8 +34,8 @@ export function defineAttributeField(initial = 0, nullable = false) {
     modifier: new NumberField({
       required: false,
       integer: true,
-      initial: 0
-    })
+      initial: 0,
+    }),
   });
 }
 /**
