@@ -54,55 +54,77 @@ export default class WHQItem extends Item {
     }
   }
   /**
+   * Rolls damage with optional strength modifier and target's toughness deduction.
    *
-   * @param {WHQActor} targetActor
+   * @param {Actor} targetActor - The actor being targeted in the roll, providing toughness for the deduction.
+   * @returns {Promise<void>} - Sends the evaluated roll message to the chat.
    */
   async _rollDamage(targetActor) {
-    console.log("Roll Damage")
     const rollData = this.getRollData();
-    const parts = ["1d6"];
-    if(rollData.str) parts.push("+ @str");
-    
-    const targetRollData = targetActor.getRollData();
-    if (targetRollData.toughness) {
-      console.log(targetRollData.toughness)
-      parts.push(`- ${targetRollData.toughness}`);
-    }
+    const parts = ["1d6", rollData.str ? "+ @str" : ""];
+    const targetToughness = targetActor.getRollData().toughness || 0;
+
+    parts.push(`- ${targetToughness}`);
+
     const rollDamage = await Roll.create(parts.join(" "), rollData).evaluate();
     await rollDamage.toMessage();
   }
 
   /**
-   * Handle for weapons melee attacks
+   * Handle melee attack rolls for weapons.
+   *
+   * Rolls a melee attack against selected targets, compares the roll with the target's weapon skill,
+   * and triggers a damage roll if successful.
+   *
+   * @returns {Promise<void>} - Resolves after rolling attacks and possibly applying damage.
    */
   async _rollMeleeAttack() {
     const targets = game.user.targets.map((t) => t.document);
     const combatTable = this.actor.getCombatTable();
 
-    if(targets.size === 0){
-      console.warn("Must select one o more targets")
+    if (targets.length === 0) {
+      console.warn(
+        "No targets selected. Please select one or more targets to attack."
+      );
+      return;
     }
+
     for (const token of targets) {
-      const r = await Roll.create("1d6").evaluate();
-      await r.toMessage();
+      const roll = await Roll.create("1d6").evaluate();
+      await roll.toMessage();
+
       const targetWS = token.actor.system.attributes.weaponSkill.total;
-      if (r.total >= combatTable[targetWS - 1]) {
-        this._rollDamage(token.actor)
-      } 
+      if (roll.total >= combatTable[targetWS - 1]) {
+        this._rollDamage(token.actor);
+      }
     }
   }
 
   /**
-   * Handle for range ranged attacks
+   * Handle ranged attack rolls.
+   *
+   * Rolls a ranged attack against selected targets, compares the roll with the actor's ballistic skill,
+   * and triggers a damage roll if the attack succeeds.
+   *
+   * @returns {Promise<void>} - Resolves after rolling attacks and possibly applying damage.
    */
   async _rollRangedAttack() {
     const targets = game.user.targets.map((t) => t.document);
-    const rollData = this.getRollData();
+    const { ballisticSkill } = this.getRollData().actor;
+
+    if (targets.length === 0) {
+      console.warn(
+        "No targets selected. Please select one or more targets to attack."
+      );
+      return;
+    }
+
     for (const token of targets) {
-      const r = await Roll.create("1d6").evaluate();
-      await r.toMessage();
-      if (r.total >= rollData.actor.ballisticSkill) {
-        this._rollDamage(token.actor)
+      const roll = await Roll.create("1d6").evaluate();
+      await roll.toMessage();
+
+      if (roll.total >= ballisticSkill) {
+        this._rollDamage(token.actor);
       }
     }
   }
