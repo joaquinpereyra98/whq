@@ -13,7 +13,7 @@ export default class WHQItemSheet extends api.HandlebarsApplicationMixin(
   /** @inheritDoc */
   static DEFAULT_OPTIONS = {
     classes: ["whq", "whq-sheet", "item"],
-    position: { width: 800, height: 600 },
+    position: { width: 600, height: 500 },
     actions: {
         onEditImage: this._onEditImage
     },
@@ -134,6 +134,12 @@ export default class WHQItemSheet extends api.HandlebarsApplicationMixin(
     switch (partId) {
       case "description":
         context.tab = context.tabs.description;
+        break;
+        case "details":
+        context.tab = context.tabs.details;
+        break;
+        case "effects":
+        context.tab = context.tabs.effects;
         break;
       default:
         break;

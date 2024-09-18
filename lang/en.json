@@ -10,7 +10,8 @@
     "WHQ": {
         "TABS": {
             "ACTORS": {
-                "Summary": "Summary"
+                "Summary": "Summary",
+                "Weapons": "Weapons"
             },
             "ITEMS": {
                 "Details": "Details",

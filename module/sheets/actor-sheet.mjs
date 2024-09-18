@@ -22,6 +22,10 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
       onEditImage: this._onEditImage,
       roll: this._onRoll,
       initWounds: this._onInitWounds,
+      createDoc: this._onCreateDoc,
+      deleteDoc: this._onDeleteDoc,
+      useDoc: this._onUseDoc,
+      editDoc: this._onEditDoc,
     },
     form: { submitOnChange: true },
     window: {
@@ -63,10 +67,10 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
    */
   static TABS = [
     {
-      id: "summary",
+      id: "weapons",
       group: "primary",
       icon: "fa-solid fa-book-user",
-      label: "WHQ.TABS.ACTORS.Summary",
+      label: "WHQ.TABS.ACTORS.Weapons",
     },
   ];
 
@@ -81,7 +85,7 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
    *  @override
    */
   tabGroups = {
-    primary: "summary",
+    primary: "weapons",
   };
 
   /**
@@ -116,6 +120,7 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
   /**
    * @param {import("../../foundry/client-esm/applications/_types.mjs").ApplicationRenderContext} context - Shared context provided by _prepareContext.
    */
+
   _prepareAttributes(context) {
     context.attributes = foundry.utils.duplicate(this.actor.system.attributes);
     for (const attribute in context.attributes) {
@@ -123,6 +128,7 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
         CONFIG.WHQ.attributes[attribute].label;
     }
   }
+
   /**
    * Prepare context that is specific to only a single rendered part.
    *
@@ -132,8 +138,9 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
    */
   async _preparePartContext(partId, context) {
     switch (partId) {
-      case "summary":
-        context.tab = context.tabs.summary;
+      case "weapons":
+        context.tab = context.tabs.weapons;
+        context.items = this.actor.itemTypes.weapon;
         break;
       case "equipament":
         context.slh = CONFIG.WHQ.silhouette;
@@ -255,5 +262,61 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
       "system.wounds.value": roll.total,
     });
     return roll.toMessage({ flavor: "Set initial Wounds" });
+  }
+
+  /**
+   * Handle for create a new emebbeded document
+   * @param {PointerEvent} event - The originating click event
+   * @param {HTMLElement} target - The capturing HTML element which defined a [data-action= "createDoc"]
+   */
+  static async _onCreateDoc(event, target) {
+    event.preventDefault()
+    const { itemType } = target.dataset;
+
+    let embeddedName;
+    switch (itemType) {
+      case "weapon":
+        embeddedName = "Item"
+        break;
+    
+      default:
+        return;
+    }
+    await this.actor.createEmbeddedDocuments(embeddedName, [{
+      name: `New ${itemType.capitalize()}`,
+      type: itemType
+    }])
+  }
+  /**
+   * Handle for execute Item#use
+   * @param {PointerEvent} event - The originating click event
+   * @param {HTMLElement} target - The capturing HTML element which defined a [data-action= "useDoc"]
+   */
+  static async _onUseDoc(event, target) {
+    event.preventDefault();
+    const uuid = target.closest('.button-panel')?.dataset.doc;
+    const doc = await fromUuid(uuid);
+
+    await doc?.use();
+  }
+
+  static async _onDeleteDoc(event, target) {
+    event.preventDefault();
+    const uuid = target.closest('.button-panel')?.dataset.doc;
+    const doc = await fromUuid(uuid);
+
+    await doc.delete()
+  }
+
+  /**
+   * Handle for render app edit
+   * @param {PointerEvent} event - The originating click event
+   * @param {HTMLElement} target - The capturing HTML element which defined a [data-action= "editDoc"]
+   */
+  static async _onEditDoc(event, target) {
+    event.preventDefault();
+    const uuid = target.closest('.button-panel')?.dataset.doc;
+    const doc = await fromUuid(uuid);
+    doc.sheet.render(true)
   }
 }

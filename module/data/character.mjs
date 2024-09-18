@@ -1,33 +1,4 @@
 import { defineAttributeField, defineBarField } from "./common.mjs";
-/**
- * @typedef {Object} CharacterSchema
- *
- * @property {Object} skills                 - The skills of the character.
- * @property {number} skills.ballistic       - Ballistic skill value.
- * @property {number} skills.weapon          - Weapon skill value.
- *
- * @property {Object} wounds                 - The health (wounds) of the character.
- * @property {number} wounds.max             - Maximum wounds.
- * @property {number} wounds.value           - Current wounds.
- *
- * @property {number} move                   - Movement value of the character.
- *
- * @property {Object} luck                   - The luck attribute of the character.
- * @property {number} luck.max               - Maximum luck value.
- * @property {number} luck.value             - Current luck value.
- *
- * @property {number} initiative             - Initiative value of the character.
- *
- * @property {Object} attributes             - The attributes of the character.
- * @property {number} attributes.attacks     - Number of attacks.
- * @property {number} attributes.pin         - Pin attribute value.
- * @property {number} attributes.strength    - Strength attribute value.
- * @property {number} attributes.toughness   - Toughness attribute value.
- * @property {number} attributes.willpower   - Willpower attribute value.
- *
- * @property {Object} details                - Additional details about the character.
- * @property {number} details.golds          - The amount of gold the character possesses.
- */
 
 export default class WHQCharacter extends foundry.abstract.TypeDataModel {
   /* -------------------------------------------- */

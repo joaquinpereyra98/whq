@@ -20,4 +20,7 @@ export default class WHQActor extends Actor {
     const flavor =`${game.i18n.localize(CONFIG.WHQ.attributes[attrKey].name)} Attribute Roll`
     await r.toMessage({flavor});
   }
+  getCombatTable(){
+    return [2,3,3,4,4,4,4,4,5,5];
+  }
 }

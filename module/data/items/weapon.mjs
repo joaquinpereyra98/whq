@@ -10,7 +10,6 @@ export default class WHQWeapon extends foundry.abstract.TypeDataModel {
       StringField,
       HTMLField,
       BooleanField,
-      ArrayField,
     } = foundry.data.fields;
 
     return {
