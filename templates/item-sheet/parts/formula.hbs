@@ -1,0 +1,26 @@
+<section class="tab summary {{tab.cssClass}}" data-group="primary" data-tab="formula">
+    <div class="tab-content">
+        <div class="damage-container">
+            <h2 class="whq-label">Damage Formula</h2>
+            <div class="damage-option-container flex-row">
+                <div class="extra-dice-container resource-container flex-col">
+                    <label class="whq-label">Extra Dice</label>
+                    {{formInput systemFields.rollOptions.fields.extraDices value=system.rollOptions.extraDices placeholder="0"}}
+                </div>
+                <div class="ignore-armor-container resource-container flex-col">
+                    <label class="whq-label"> ignore Armor?</label>
+                    {{formInput systemFields.rollOptions.fields.ignoreArmor value=system.rollOptions.ignoreArmor}}
+                </div>
+                <div class="hit-modifier-container resource-container flex-col">
+                    <label class="whq-label">Additional Modifiers</label>
+                    {{formInput systemFields.rollOptions.fields.damageModifier value=system.rollOptions.damageModifier placeholder="+ 4 + 1d6"}}
+                </div>
+            </div>
+            <div class="formula-damage-container flex-col">
+                <label class="whq-label">Formula:</label>
+                <input type="text" value="{{damageFormula}}" disabled>
+            </div>
+        </div>
+    </div>
+</section>
+

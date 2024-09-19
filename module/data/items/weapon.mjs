@@ -1,16 +1,13 @@
+import { FormulaField } from "../common.mjs";
+
 export default class WHQWeapon extends foundry.abstract.TypeDataModel {
   /**
    * @override
    * @returns { import("../../../foundry/common/abstract/data.mjs").DataSchema }
    */
   static defineSchema() {
-    const {
-      SchemaField,
-      NumberField,
-      StringField,
-      HTMLField,
-      BooleanField,
-    } = foundry.data.fields;
+    const { SchemaField, NumberField, StringField, HTMLField, BooleanField } =
+      foundry.data.fields;
 
     return {
       //Details
@@ -26,6 +23,10 @@ export default class WHQWeapon extends foundry.abstract.TypeDataModel {
         min: 0,
       }),
 
+      attributes: new SchemaField({
+        strength: new NumberField({integer: true, required: false})
+      }),
+
       //Equipament
       equipped: new BooleanField({ required: true }),
 
@@ -35,9 +36,15 @@ export default class WHQWeapon extends foundry.abstract.TypeDataModel {
       }),
 
       rollOptions: new SchemaField({
-        ignoreArmor: new BooleanField({required: true, initial: false}),
-        extraDices: new NumberField({required: false, integer: true,}),
-      })
+        ignoreArmor: new BooleanField({ required: true, initial: false }),
+        extraDices: new NumberField({ required: true, integer: true, min: 0 }),
+        damageModifier: new FormulaField({
+          required: false,
+          initial: "",
+          trim: true,
+          deterministic: false
+        }),
+      }),
     };
   }
 }

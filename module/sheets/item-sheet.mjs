@@ -4,7 +4,7 @@ const { api, sheets } = foundry.applications;
 export default class WHQItemSheet extends api.HandlebarsApplicationMixin(
   sheets.ItemSheetV2
 ) {
-      /**
+  /**
    * ---------------------------------------
    * 1. Constructor & Static Defaults
    * ---------------------------------------
@@ -41,8 +41,8 @@ export default class WHQItemSheet extends api.HandlebarsApplicationMixin(
       template: CONSTANT.itemParts("description.hbs")
     },
     //Details Tab:
-    details: {
-      template: CONSTANT.itemParts("details.hbs")
+    formula: {
+      template: CONSTANT.itemParts("formula.hbs")
     },
     //Effects Tab:
     effects: {
@@ -61,10 +61,10 @@ export default class WHQItemSheet extends api.HandlebarsApplicationMixin(
       label: "WHQ.TABS.Description",
     },
     {
-      id: "details",
+      id: "formula",
       group: "primary",
-      icon: "fa-solid fa-toolbox",
-      label: "WHQ.TABS.ITEMS.Details",
+      icon: "fa-solid fa-dice",
+      label: "WHQ.TABS.ITEMS.Roll",
     },
     {
       id: "effects",
@@ -135,8 +135,9 @@ export default class WHQItemSheet extends api.HandlebarsApplicationMixin(
       case "description":
         context.tab = context.tabs.description;
         break;
-        case "details":
-        context.tab = context.tabs.details;
+        case "formula":
+        context.tab = context.tabs.formula;
+        context.damageFormula = this.document.getDamageFormula();
         break;
         case "effects":
         context.tab = context.tabs.effects;
