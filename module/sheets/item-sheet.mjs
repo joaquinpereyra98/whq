@@ -1,4 +1,5 @@
-import CONSTANT from '../constants.mjs';
+import CONSTANT from "../constants.mjs";
+import { prepareActiveEffectCategories } from "./common.mjs";
 const { api, sheets } = foundry.applications;
 
 export default class WHQItemSheet extends api.HandlebarsApplicationMixin(
@@ -15,7 +16,10 @@ export default class WHQItemSheet extends api.HandlebarsApplicationMixin(
     classes: ["whq", "whq-sheet", "item"],
     position: { width: 600, height: 500 },
     actions: {
-        onEditImage: this._onEditImage
+      onEditImage: this._onEditImage,
+      createEffect: this._onCreateEffect,
+      editEffect: this._onEditEffect,
+      deleteEffect: this._onDeleteEffect,
     },
     form: { submitOnChange: true },
     window: {
@@ -30,24 +34,24 @@ export default class WHQItemSheet extends api.HandlebarsApplicationMixin(
     header: {
       template: CONSTANT.itemParts("header-part.hbs"),
     },
-     //Nav Bar
-     tabs: {
+    //Nav Bar
+    tabs: {
       // Foundry-provided generic template
       template: "templates/generic/tab-navigation.hbs",
       classes: ["body-part"],
     },
     //Description Tab:
     description: {
-      template: CONSTANT.itemParts("description.hbs")
+      template: CONSTANT.itemParts("description.hbs"),
     },
     //Details Tab:
     formula: {
-      template: CONSTANT.itemParts("formula.hbs")
+      template: CONSTANT.itemParts("formula.hbs"),
     },
     //Effects Tab:
     effects: {
-      template: CONSTANT.itemParts("effects.hbs")
-    }
+      template: CONSTANT.itemParts("effects.hbs"),
+    },
   };
   /**
    * Available tabs for the sheet.
@@ -74,7 +78,7 @@ export default class WHQItemSheet extends api.HandlebarsApplicationMixin(
     },
   ];
 
- /**
+  /**
    * ---------------------------------------
    * 2. State Variables
    * ---------------------------------------
@@ -121,7 +125,7 @@ export default class WHQItemSheet extends api.HandlebarsApplicationMixin(
     };
 
     return context;
-  };
+  }
 
   /**
    * Prepare context that is specific to only a single rendered part.
@@ -135,12 +139,13 @@ export default class WHQItemSheet extends api.HandlebarsApplicationMixin(
       case "description":
         context.tab = context.tabs.description;
         break;
-        case "formula":
+      case "formula":
         context.tab = context.tabs.formula;
         context.damageFormula = this.document.getDamageFormula();
         break;
-        case "effects":
+      case "effects":
         context.tab = context.tabs.effects;
+        context.effects = prepareActiveEffectCategories(this.document.effects);
         break;
       default:
         break;
@@ -148,12 +153,12 @@ export default class WHQItemSheet extends api.HandlebarsApplicationMixin(
     return context;
   }
 
-   /**
+  /**
    * Prepare an array of sheet tabs.
    * @this WHQActorSheet
    * @returns {Record<string, Partial<import("../../foundry/client-esm/applications/_types.mjs").ApplicationTab>>}
    */
-   _getTabs() {
+  _getTabs() {
     const tabs = Object.fromEntries(
       this.constructor.TABS.map((tab) => {
         const active = this.tabGroups[tab.group] === tab.id;
@@ -178,7 +183,6 @@ export default class WHQItemSheet extends api.HandlebarsApplicationMixin(
 
   /**
    * Handle changing a Document's image.
-   *
    * @this DrawSteelActorSheet
    * @param {PointerEvent} event   The originating click event
    * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
@@ -204,4 +208,50 @@ export default class WHQItemSheet extends api.HandlebarsApplicationMixin(
     return fp.browse();
   }
 
+  /**
+   * Handle creating a new Owned Item or ActiveEffect for the actor using initial data defined in the HTML dataset
+   * @this DrawSteelItemSheet
+   * @param {PointerEvent} event   The originating click event
+   * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
+   * @private
+   */
+  static async _onCreateEffect(event, target) {
+    event.preventDefault();
+    const aeCls = getDocumentClass("ActiveEffect");
+    const { type } = target.dataset;
+    console.log(type === "inactive");
+    const effectData = {
+      name: "New Active Effect",
+      origin: this.document.uuid,
+      disabled: type === "inactive",
+      img: "icons/svg/aura.svg",
+    };
+
+    await aeCls.create(effectData, { parent: this.item });
+  }
+
+  /**
+   * Handle for deletec Activee Effects
+   * @param {PointerEvent} event 
+   * @param {HTMLElement} target 
+   */
+  static async _onDeleteEffect(event, target) {
+    event.preventDefault();
+    const uuid = target.closest(".button-panel")?.dataset.doc;
+    const doc = await fromUuid(uuid);
+
+    await doc.delete();
+  }
+
+  /**
+   * Handle for render Active Effect app
+   * @param {PointerEvent} event 
+   * @param {HTMLElement} target 
+   */
+  static async _onEditEffect(event, target) {
+    event.preventDefault();
+    const uuid = target.closest(".button-panel")?.dataset.doc;
+    const doc = await fromUuid(uuid);
+    doc.sheet.render(true);
+  }
 }

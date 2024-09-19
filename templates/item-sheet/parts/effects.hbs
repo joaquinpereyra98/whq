@@ -1,5 +1,41 @@
-<section class="tab summary {{tab.cssClass}}" data-group="primary" data-tab="effects">
-    <div class="tab-content flex-container">
-        EFFECTS
-    </div>
+{{! Effects Tab }}
+<section class="tab effects {{tab.cssClass}}" data-group="primary" data-tab="effects">
+    <ol class="effects-list">
+        {{#each effects as |section sid|}}
+        <div class="tab-title flex-row">
+            <h3>{{section.label}}</h3>
+            <a data-action="createEffect" data-type="{{section.type}}">
+                <i class="fa-solid fa-plus"></i>
+                <label class="whq-label">New Effect</label>
+            </a>
+        </div>
+        <div class="active-effect-list">
+            {{#each section.effects as |effect|}}
+                <div class="active-effect-element">
+                    <div class="name-container flex-row">
+                        <img src="{{effect.img}}" alt="{{effect.name}}">
+                        <label class="whq-label">{{effect.name}}</label>
+                    </div>
+                    {{#if effect.isTemporal}}
+                    <div class="temporal-container">
+                        <i class="fa-solid fa-clock"></i>
+                        <span>{{effect.duration.label}}</span>
+                    </div>
+                    {{/if}}
+                    <div class="button-panel" data-doc="{{effect.uuid}}">
+                    <a class="action-button doc-button" data-action="activeEffect">
+                        <i class="fa-solid {{ifThen effect.disabled "fa-lightbulb" "fa-lightbulb-on"}}"></i>
+                    </a>
+                    <a class="action-button doc-button" data-action="deleteEffect">
+                        <i class="fa-solid fa-trash"></i>
+                    </a>
+                    <a class="action-button doc-button" data-action="editEffect">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </a>
+                </div>
+                </div>
+            {{/each}}
+        </div>
+        {{/each}}
+    </ol>
 </section>

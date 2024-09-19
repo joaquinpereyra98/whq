@@ -123,6 +123,15 @@
     border-radius: 4px;
     margin: 0 3px;
 }
+
+.whq .tab-title {
+    justify-content: space-between;
+    align-items: center;
+    margin: 5px 0;
+}
+.whq .tab-title h3 {
+    margin: 0;
+}
 /*========================= SHEET HEADER =========================*/
 
 .whq .sheet-header {
@@ -269,4 +278,24 @@
 .damage-container .formula-damage-container input {
     text-align: center;
     font-size: large;
+}
+
+/*========================= EFFECT PART  =========================*/
+.whq .active-effect-element {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 10px;
+    background-color: rgba(0, 0, 0, 0.2);
+    margin: 2px 0;
+}
+
+.whq .active-effect-element img {
+    width: 2em;
+    height: 2em;
+    border: 0;
+}
+
+.whq .active-effect-element .button-panel a {
+    margin: 0 2px;
 }

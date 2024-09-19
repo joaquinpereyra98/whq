@@ -21,7 +21,6 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
     actions: {
       onEditImage: this._onEditImage,
       roll: this._onRoll,
-      initWounds: this._onInitWounds,
       createDoc: this._onCreateDoc,
       deleteDoc: this._onDeleteDoc,
       useDoc: this._onUseDoc,
@@ -69,7 +68,7 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
     {
       id: "weapons",
       group: "primary",
-      icon: "fa-solid fa-book-user",
+      icon: "fa-solid fa-sword",
       label: "WHQ.TABS.ACTORS.Weapons",
     },
   ];
@@ -133,7 +132,7 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
    * Prepare context that is specific to only a single rendered part.
    *
    * @param {string} partId - The part being rendered
-   * @param {context} context - Shared context provided by _prepareContext
+   * @param {import("../../foundry/client-esm/applications/_types.mjs").ApplicationRenderContext} context - Shared context provided by _prepareContext
    * @returns
    */
   async _preparePartContext(partId, context) {
@@ -173,8 +172,8 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
   }
   /**
    *
-   * @param {*} context
-   * @param {*} options
+   * @param {import("../../foundry/client-esm/applications/_types.mjs").ApplicationRenderContext} context
+   * @param {import("../../foundry/client-esm/applications/_types.mjs").ApplicationRenderOptions} options
    */
   _onFirstRender(context, options) {
     super._onFirstRender(context, options);
@@ -300,6 +299,11 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
     await doc?.use();
   }
 
+  /**
+   * Handle for delete Documents
+   * @param {PointerEvent} event 
+   * @param {HTMLElement} target 
+   */
   static async _onDeleteDoc(event, target) {
     event.preventDefault();
     const uuid = target.closest('.button-panel')?.dataset.doc;
