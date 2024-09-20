@@ -25,6 +25,7 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
       deleteDoc: this._onDeleteDoc,
       useDoc: this._onUseDoc,
       editDoc: this._onEditDoc,
+      initWounds: this._onInitWounds
     },
     form: { submitOnChange: true },
     window: {
@@ -243,8 +244,15 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
   static async _onRoll(event, target) {
     event.preventDefault();
     const { rollType } = target.dataset;
-    if (rollType === "attribute") {
-      await this.actor.rollAttribute(target.dataset.attribute);
+    switch (rollType) {
+      case "attribute":
+        const attribute = target.dataset.attribute;
+        if(attribute !== 'move') {
+          await this.actor.rollAttribute(attribute);
+        }
+        break;
+      default:
+        break;
     }
   }
 

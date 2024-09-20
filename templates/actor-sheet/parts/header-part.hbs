@@ -19,7 +19,13 @@
         </div>
         <div class="header-resources flex-row">
             <div class="resource-container flex-col">
-                <label class="whq-label">Wounds</label>
+                <label class="whq-label">Wounds
+                    {{#unless isWoundInit}}
+                    <a data-action="initWounds">
+                        <i class="fa-solid fa-dice"></i>
+                    </a>
+                    {{/unless}}
+                </label>
                 <div class="wounds-bar resource-bar flex-row">
                     <input class="bar-input-value" type="number" name="system.wounds.value" value="{{system.wounds.value}}">
                     <input class="bar-input-max" type="number" name="system.wounds.max" value="{{system.wounds.max}}">

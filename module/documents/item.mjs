@@ -137,7 +137,7 @@ export default class WHQItem extends Item {
   /**
    * Rolls damage with optional strength modifier and target's toughness deduction.
    *
-   * @param {TargetDescriptor} targetActor - The actor being targeted in the roll, providing toughness for the deduction.
+   * @param {TargetDescriptor} target - The actor being targeted in the roll, providing toughness for the deduction.
    * @returns {Promise<void>} - Sends the evaluated roll message to the chat.
    */
   async _rollDamage(target) {
@@ -147,7 +147,10 @@ export default class WHQItem extends Item {
     const formula = this.getDamageFormula();
 
     const rollDamage = await Roll.create(formula, rollData).evaluate();
-    await rollDamage.toMessage();
+    await rollDamage.toMessage({flavor: "Roll Damage"});
+
+    const actor = await fromUuid(target.uuid);
+    await actor.applyDamage(rollDamage.total)
   }
 
   /**
@@ -172,7 +175,7 @@ export default class WHQItem extends Item {
       "1d6 + @actor.weaponSkill",
       this.getRollData()
     ).evaluate();
-    await roll.toMessage();
+    await roll.toMessage({flavor: "Roll Melee Attack"});
 
     const targets = this.constructor._formatAttackTargets();
     for (const target of targets) {
@@ -204,7 +207,7 @@ export default class WHQItem extends Item {
       "1d6",
       rollData
     ).evaluate();
-    await roll.toMessage();
+    await roll.toMessage({flavor: "Roll Ranged Attack"});
 
     const targets = this.constructor._formatAttackTargets();
 

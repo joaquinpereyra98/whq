@@ -70,12 +70,12 @@ export default class WHQItemSheet extends api.HandlebarsApplicationMixin(
       icon: "fa-solid fa-dice",
       label: "WHQ.TABS.ITEMS.Roll",
     },
-    {
+    /*{
       id: "effects",
       group: "primary",
       icon: "fa-solid fa-stars",
       label: "WHQ.TABS.ITEMS.Effects",
-    },
+    },*/
   ];
 
   /**
