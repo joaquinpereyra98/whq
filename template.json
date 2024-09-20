@@ -7,8 +7,8 @@
     },
     "Item": {
         "types": [
-            "weapon"
+            "weapon", "armor"
         ],
-        "htmlFields": []
+        "htmlFields": ["description"]
     }
 }

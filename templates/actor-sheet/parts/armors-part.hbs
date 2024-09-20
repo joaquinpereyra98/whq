@@ -1,0 +1,28 @@
+<section class="tab summary {{tab.cssClass}}" data-group="primary" data-tab="armors">
+    <div class="tab-content flex-container">
+        <div class="tab-title flex-row">
+            <h3>Armors</h3>
+            <a data-action="createDoc" data-item-type="armor">
+                <i class="fa-solid fa-plus"></i>
+                <label class="whq-label">New Armor</label>
+            </a>
+        </div>
+        <div class="document-panel">
+            {{#each items as |item|}}
+            <div class="item-container flex-row">
+                <div class="item-portait flex-col">
+                    <img src="{{item.img}}" alt="{{item.name}}">
+                </div>
+                <div class="button-panel" data-doc="{{item.uuid}}">
+                    <a class="action-button doc-button" data-action="deleteDoc">
+                        <i class="fa-solid fa-trash"></i>
+                    </a>
+                    <a class="action-button doc-button" data-action="editDoc">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </a>
+                </div>
+            </div>
+            {{/each}}
+        </div>
+    </div>
+</section>

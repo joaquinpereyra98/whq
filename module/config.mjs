@@ -66,4 +66,12 @@ WHQ.weaponTypes = {
   ranged: "Ranged Weapon"
 }
 
+WHQ.armorTypes = {
+  armour: "Armour",
+  boots: "Boots",
+  helmet: "Helmet",
+  fur: "Fur",
+  shields: "Shields"
+}
+
 export default WHQ;

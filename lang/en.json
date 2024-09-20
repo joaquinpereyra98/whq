@@ -4,14 +4,16 @@
             "elf": "Elf"
         },
         "Item": {
-            "weapon": "Weapon"
+            "weapon": "Weapon",
+            "armor": "Armor"
         }
     },
     "WHQ": {
         "TABS": {
             "ACTORS": {
                 "Summary": "Summary",
-                "Weapons": "Weapons"
+                "Weapons": "Weapons",
+                "Armors": "Armors"
             },
             "ITEMS": {
                 "Roll": "Roll Formula",

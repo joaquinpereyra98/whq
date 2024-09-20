@@ -13,10 +13,10 @@
         </div>
         <div class="header-resources flex-row">
             <div class="resource-container flex-col">
-                <label class="whq-label">Type Weapon</label>
+                <label class="whq-label">Type</label>
                 {{formInput systemFields.type
                 value=item.system.type
-                placeholder="Weapon Type"
+                placeholder="Type"
                 }}
             </div>
             <div class="resource-container flex-col">
@@ -25,13 +25,5 @@
                 value=item.system.price
                 }}
             </div>
-            {{#if item.parent}}
-            <div class="resource-container flex-col">
-                <label class="whq-label">Equipped</label>
-                {{formInput systemFields.equipped
-                value=item.system.equipped
-                }}
-            </div>
-            {{/if}}
         </div>
 </header>

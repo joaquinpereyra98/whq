@@ -15,7 +15,8 @@ Hooks.on("init", () => {
         elf: dataModels.characterModel
     }
     CONFIG.Item.dataModels = {
-      weapon: dataModels.weaponModel
+      weapon: dataModels.weaponModel,
+      armor: dataModels.armorModel
     }
 
     Actors.unregisterSheet('core', ActorSheet);

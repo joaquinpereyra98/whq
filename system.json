@@ -48,6 +48,21 @@
   "manifest": "",
   "download": "",
   "background": "systems/whq/assets/logos/warhammer-quest-card-game.jpg",
+  "documentTypes": {
+    "Actor": {
+      "elf": {
+        "htmlFields": []
+      }
+    },
+    "Item" :{
+      "weapon": {
+        "htmlFields": ["description"]
+      },
+      "armor": {
+        "htmlFields": ["description"]
+      }
+    }
+  },
   "grid": {
     "type": 1,
     "distance": 1,

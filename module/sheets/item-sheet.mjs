@@ -93,11 +93,31 @@ export default class WHQItemSheet extends api.HandlebarsApplicationMixin(
     primary: "description",
   };
 
+  _tabs;
+
   /**
    * ---------------------------------------
    * 3. Rendering & Context Preparation
    * ---------------------------------------
    */
+
+  /** @override */
+  _configureRenderOptions(options) {
+    super._configureRenderOptions(options);
+    options.parts = ["header", "tabs", "description"];
+
+    if (this.document.limited) return;
+
+    switch (this.document.type) {
+      case "weapon":
+        options.parts.push("formula");
+        break;
+      case "armor":
+        break;
+    }
+
+    this._tabs = options.parts;
+  }
 
   /**
    * Prepare application rendering context data for a given render request.
@@ -138,6 +158,14 @@ export default class WHQItemSheet extends api.HandlebarsApplicationMixin(
     switch (partId) {
       case "description":
         context.tab = context.tabs.description;
+        context.enrichedDescription = await TextEditor.enrichHTML(
+          this.document.system.description,
+          {
+            secrets: this.document.isOwner,
+            rollData: this.document.getRollData(),
+            relativeTo: this.document,
+          }
+        );
         break;
       case "formula":
         context.tab = context.tabs.formula;
@@ -159,8 +187,9 @@ export default class WHQItemSheet extends api.HandlebarsApplicationMixin(
    * @returns {Record<string, Partial<import("../../foundry/client-esm/applications/_types.mjs").ApplicationTab>>}
    */
   _getTabs() {
+    const TABS = this.constructor.TABS.filter(({id}) => this._tabs.includes(id));
     const tabs = Object.fromEntries(
-      this.constructor.TABS.map((tab) => {
+      TABS.map((tab) => {
         const active = this.tabGroups[tab.group] === tab.id;
         return [
           tab.id,
@@ -232,8 +261,8 @@ export default class WHQItemSheet extends api.HandlebarsApplicationMixin(
 
   /**
    * Handle for deletec Activee Effects
-   * @param {PointerEvent} event 
-   * @param {HTMLElement} target 
+   * @param {PointerEvent} event
+   * @param {HTMLElement} target
    */
   static async _onDeleteEffect(event, target) {
     event.preventDefault();
@@ -245,8 +274,8 @@ export default class WHQItemSheet extends api.HandlebarsApplicationMixin(
 
   /**
    * Handle for render Active Effect app
-   * @param {PointerEvent} event 
-   * @param {HTMLElement} target 
+   * @param {PointerEvent} event
+   * @param {HTMLElement} target
    */
   static async _onEditEffect(event, target) {
     event.preventDefault();

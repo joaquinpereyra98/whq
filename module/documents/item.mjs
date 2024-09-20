@@ -15,6 +15,10 @@ export default class WHQItem extends Item {
     return this.isWeapon && this.system?.type === "ranged";
   }
 
+  get isAmor() {
+    return this.type === 'armor';
+  }
+
   /**
    * Important information on a targeted token.
    *

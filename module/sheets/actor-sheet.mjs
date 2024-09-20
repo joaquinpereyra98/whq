@@ -59,6 +59,10 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
       template: CONSTANT.actorParts("weapons-part.hbs"),
       classes: ["body-part"],
     },
+    armors: {
+      template: CONSTANT.actorParts("armors-part.hbs"),
+      classes: ["body-part"]
+    }
   };
 
   /**
@@ -72,6 +76,12 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
       icon: "fa-solid fa-sword",
       label: "WHQ.TABS.ACTORS.Weapons",
     },
+    {
+      id: "armors",
+      group: "primary",
+      icon: "fa-solid fa-helmet-battle",
+      label: "WHQ.TABS.ACTORS.Armors"
+    }
   ];
 
   /**
@@ -141,6 +151,10 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
       case "weapons":
         context.tab = context.tabs.weapons;
         context.items = this.actor.itemTypes.weapon;
+        break;
+      case "armors":
+        context.tab = context.tabs.armor;
+        context.items = this.actor.itemTypes.armor;
         break;
       case "equipament":
         context.slh = CONFIG.WHQ.silhouette;
@@ -280,15 +294,8 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
     event.preventDefault()
     const { itemType } = target.dataset;
 
-    let embeddedName;
-    switch (itemType) {
-      case "weapon":
-        embeddedName = "Item"
-        break;
-    
-      default:
-        return;
-    }
+    const embeddedName = itemType === "effect" ? "ActiveEffect": "Item";
+
     await this.actor.createEmbeddedDocuments(embeddedName, [{
       name: `New ${itemType.capitalize()}`,
       type: itemType
