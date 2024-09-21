@@ -69,6 +69,9 @@
     flex: 10;
 }
 
+.whq [data-drag="true"] {
+    cursor: grab;
+}
 /*=========================== GENERAL ELEMENTS ============================*/
 
 .whq h1,
@@ -86,6 +89,10 @@
     margin: 5px 7px;
     font-family: var(--whq-font-label);
     font-size: large;
+}
+.whq a .whq-label {
+    cursor: pointer;
+    margin: 5px 0;
 }
 
 .whq.whq-sheet .resource-bar input {
@@ -237,15 +244,57 @@
     justify-content: flex-end;
 }
 
-/*========================= EQUIPAMENT PART =========================*/
-.whq .sheet-container .equipament-card {
+/*========================= EQUIPMENT PART =========================*/
+.whq .sheet-container .equipment-card {
     width: 30%;
     margin: 5px;
     border: 2px solid;
     border-radius: 8px;
     padding: 10px;
 }
+.equipment-card .silhouette-frame {
+    position: relative;
+}
+.equipment-card .silhouette-frame .silhouette-img {
+    padding: 1.5em;
+}
+.equipment-card .silhouette-frame .equip-slot {
+    position: absolute;
+    width: 28%;
+    display: flex;
+    border-image-source: url(../assets/ui/inventory_frame.png);
+    border-image-slice: 6 6 6 6 fill;
+    border-image-outset: 0 3px 3px 0;
+}
+.equipment-card .silhouette-frame .equip-slot img {
+    background: url(../assets/ui/little_background_frame.png);
+}
+.equipment-card .silhouette-frame .equip-slot .empty-slot {
+    opacity: 0.7;
+}
+.equipment-card .silhouette-frame .equip-slot.head-slot{
+    right: 35%;
+    top: 5%;
+}
 
+.equipment-card .silhouette-frame .equip-slot.body-slot{
+    right: 35%;
+    top: 25%;
+}
+
+.equipment-card .silhouette-frame .equip-slot.left-hand-slot {
+    top: 40%;
+    left: 5%;
+}
+
+.equipment-card .silhouette-frame .equip-slot.right-hand-slot {
+    top: 40%;
+    right: 5%;
+}
+.equipment-card .silhouette-frame .equip-slot.boots-slot{
+    right: 35%;
+    bottom: 10%;
+}
 /*========================= BODY SHEET =========================*/
 .whq .sheet-body {
     width: 70%;

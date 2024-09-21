@@ -1,0 +1,18 @@
+<div class="equipment-card flex-container">
+    <div class="silhouette-frame">
+        <img class="silhouette-img" src="{{slh}}" alt="silhouette">
+        {{#each equipSlots as |slot slotKey|}}
+        <div class="equip-slot {{slot.cssClass}}" data-slot="{{slotKey}}">
+            {{#if slot.item.img}}
+            <img class="fullied-slot item-container" data-doc="{{item.uuid}}" data-drag="true" src="{{slot.item.img}}" alt="{{slotKey}}">
+            {{else}}
+            <img class="empty-slot" src="systems/whq/assets/ui/little_background_frame.png" alt="{{slotKey}}">
+            {{/if}}
+        </div>
+        {{/each}}
+    </div>
+
+    <div class="equipment-container">
+
+    </div>
+</div>

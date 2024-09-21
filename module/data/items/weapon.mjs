@@ -10,7 +10,6 @@ export default class WHQWeapon extends foundry.abstract.TypeDataModel {
       foundry.data.fields;
 
     return {
-      //Details
       description: new HTMLField({
         required: true,
         nullable: true,
@@ -27,10 +26,8 @@ export default class WHQWeapon extends foundry.abstract.TypeDataModel {
         strength: new NumberField({integer: true, required: false})
       }),
 
-      //Equipament
       equipped: new BooleanField({ required: true }),
 
-      //Combat
       type: new StringField({
         choices: CONFIG.WHQ.weaponTypes,
       }),

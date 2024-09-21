@@ -67,11 +67,11 @@ WHQ.weaponTypes = {
 }
 
 WHQ.armorTypes = {
-  armour: "Armour",
+  body: "Armour",
   boots: "Boots",
   helmet: "Helmet",
   fur: "Fur",
-  shields: "Shields"
+  shield: "Shield"
 }
 
 export default WHQ;

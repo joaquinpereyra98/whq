@@ -1,4 +1,10 @@
-import { defineAttributeField, defineBarField } from "./common.mjs";
+import {
+  defineAttributeField,
+  defineBarField,
+  defineEquipmentField,
+} from "./common.mjs";
+
+import CONSTANT from "../constants.mjs";
 
 export default class WHQCharacter extends foundry.abstract.TypeDataModel {
   /* -------------------------------------------- */
@@ -10,7 +16,6 @@ export default class WHQCharacter extends foundry.abstract.TypeDataModel {
     const { SchemaField, NumberField } = foundry.data.fields;
 
     return {
-      // Wounds
       wounds: defineBarField(),
 
       initiative: new NumberField({
@@ -32,7 +37,6 @@ export default class WHQCharacter extends foundry.abstract.TypeDataModel {
         luck: defineAttributeField(),
       }),
 
-      // Details
       details: new SchemaField({
         gold: new NumberField({
           required: true,
@@ -44,8 +48,18 @@ export default class WHQCharacter extends foundry.abstract.TypeDataModel {
           required: true,
           integer: true,
           nullable: false,
-          initial: 0,
+          initial: 1,
+          min: 1,
+          max: 10,
         }),
+      }),
+
+      equipment: new SchemaField({
+        head: defineEquipmentField(),
+        body: defineEquipmentField(),
+        leftHand: defineEquipmentField(),
+        rightHand: defineEquipmentField(),
+        boots: defineEquipmentField(),
       }),
     };
   }
@@ -75,13 +89,35 @@ export default class WHQCharacter extends foundry.abstract.TypeDataModel {
     }
 
     this.details.title = getTitleByLevel(level);
+
+    const equipmentIds = new Set();
+    CONSTANT.equipKeys.forEach((slot) => {
+      const id = this.equipment[slot]?._id;
+      if(equipmentIds.has(id)){
+        console.warn(`Item ${id} is alreasy is equiped on Actor ${this.parent?._id}`)
+      } else if(id) {
+        equipmentIds.add(id)
+      }
+    });
+
+    Object.defineProperty(this, "equipmentIds", {
+      value: equipmentIds,
+      enumerable: false,
+      writable: false
+    });
   }
 
   prepareDerivedData() {
-    Object.values(this.attributes).forEach(attr => {
-      attr.total = attr.value + attr.modifier + attr.mods.reduce((sum, { value, mod }) => 
-        typeof value === 'number' ? sum + value + mod : sum, 0);
-    });    
+    Object.values(this.attributes).forEach((attr) => {
+      attr.total =
+        attr.value +
+        attr.modifier +
+        attr.mods.reduce(
+          (sum, { value, mod }) =>
+            typeof value === "number" ? sum + value + mod : sum,
+          0
+        );
+    });
   }
 
   /**
@@ -90,9 +126,9 @@ export default class WHQCharacter extends foundry.abstract.TypeDataModel {
    */
   getRollData() {
     const data = foundry.utils.deepClone(this);
-    Object.keys(this.attributes).forEach(attrKey => {
+    Object.keys(this.attributes).forEach((attrKey) => {
       data[attrKey] = this.attributes[attrKey].total;
-    })
+    });
     return data;
   }
 }

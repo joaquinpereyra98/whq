@@ -1,5 +1,10 @@
-const { SchemaField, NumberField, ArrayField, StringField } =
-  foundry.data.fields;
+const {
+  SchemaField,
+  NumberField,
+  ArrayField,
+  StringField,
+  ForeignDocumentField,
+} = foundry.data.fields;
 /**
  * Create a new instance of Number Field integer and required
  * @param {Number} initial - initial value, default 0
@@ -60,19 +65,30 @@ export function defineBarField(val = 0, max = null) {
     }),
   });
 }
+/**
+ * Create anew instance of ForeignDocumentField for Items model
+ * @returns {import (../../foundry/common/data/fields.mjs).ForeignDocumentField}
+ */
+export function defineEquipmentField() {
+  return new LocalDocumentField(foundry.documents.BaseItem, {
+    required: true,
+    fallback: true,
+    idOnly: false
+  });
+}
 
 /**
  * Special case StringField which represents a formula.
+ * copy form DnD5e
  *
  * @param {FormulaFieldOptions} [options={}]  Options which configure the behavior of the field.
  * @property {boolean} deterministic=false    Is this formula not allowed to have dice values?
  */
 export class FormulaField extends foundry.data.fields.StringField {
-
   /** @inheritDoc */
   static get _defaults() {
     return foundry.utils.mergeObject(super._defaults, {
-      deterministic: false
+      deterministic: false,
     });
   }
 
@@ -81,9 +97,9 @@ export class FormulaField extends foundry.data.fields.StringField {
   /** @inheritDoc */
   _validateType(value) {
     Roll.validate(value);
-    if ( this.options.deterministic ) {
+    if (this.options.deterministic) {
       const roll = new Roll(value);
-      if ( !roll.isDeterministic ) throw new Error("must not contain dice terms");
+      if (!roll.isDeterministic) throw new Error("must not contain dice terms");
     }
     super._validateType(value);
   }
@@ -101,7 +117,7 @@ export class FormulaField extends foundry.data.fields.StringField {
 
   /** @override */
   _applyChangeAdd(value, delta, model, change) {
-    if ( !value ) return delta;
+    if (!value) return delta;
     const operator = delta.startsWith("-") ? "-" : "+";
     delta = delta.replace(/^[+-]/, "").trim();
     return `${value} ${operator} ${delta}`;
@@ -111,9 +127,9 @@ export class FormulaField extends foundry.data.fields.StringField {
 
   /** @override */
   _applyChangeMultiply(value, delta, model, change) {
-    if ( !value ) return delta;
+    if (!value) return delta;
     const terms = new Roll(value).terms;
-    if ( terms.length > 1 ) return `(${value}) * ${delta}`;
+    if (terms.length > 1) return `(${value}) * ${delta}`;
     return `${value} * ${delta}`;
   }
 
@@ -121,9 +137,10 @@ export class FormulaField extends foundry.data.fields.StringField {
 
   /** @override */
   _applyChangeUpgrade(value, delta, model, change) {
-    if ( !value ) return delta;
+    if (!value) return delta;
     const terms = new Roll(value).terms;
-    if ( (terms.length === 1) && (terms[0].fn === "max") ) return current.replace(/\)$/, `, ${delta})`);
+    if (terms.length === 1 && terms[0].fn === "max")
+      return current.replace(/\)$/, `, ${delta})`);
     return `max(${value}, ${delta})`;
   }
 
@@ -131,9 +148,93 @@ export class FormulaField extends foundry.data.fields.StringField {
 
   /** @override */
   _applyChangeDowngrade(value, delta, model, change) {
-    if ( !value ) return delta;
+    if (!value) return delta;
     const terms = new Roll(value).terms;
-    if ( (terms.length === 1) && (terms[0].fn === "min") ) return current.replace(/\)$/, `, ${delta})`);
+    if (terms.length === 1 && terms[0].fn === "min")
+      return current.replace(/\)$/, `, ${delta})`);
     return `min(${value}, ${delta})`;
+  }
+}
+
+/**
+ * @typedef {StringFieldOptions} LocalDocumentFieldOptions
+ * @property {boolean} [fallback=false]  Display the string value if no matching item is found.
+ */
+
+/**
+ * A mirror of ForeignDocumentField that references a Document embedded within this Document.
+ *
+ * @param {typeof Document} model              The local DataModel class definition which this field should link to.
+ * @param {LocalDocumentFieldOptions} options  Options which configure the behavior of the field.
+ */
+export class LocalDocumentField extends foundry.data.fields.DocumentIdField {
+  constructor(model, options={}) {
+    if ( !foundry.utils.isSubclass(model, foundry.abstract.DataModel) ) {
+      throw new Error("A ForeignDocumentField must specify a DataModel subclass as its type");
+    }
+
+    super(options);
+    this.model = model;
+  }
+
+  /* -------------------------------------------- */
+
+  /**
+   * A reference to the model class which is stored in this field.
+   * @type {typeof Document}
+   */
+  model;
+
+  /* -------------------------------------------- */
+
+  /** @inheritDoc */
+  static get _defaults() {
+    return foundry.utils.mergeObject(super._defaults, {
+      nullable: true,
+      readonly: false,
+      idOnly: false,
+      fallback: false
+    });
+  }
+
+  /* -------------------------------------------- */
+
+  /** @override */
+  _cast(value) {
+    if ( typeof value === "string" ) return value;
+    if ( (value instanceof this.model) ) return value._id;
+    throw new Error(`The value provided to a LocalDocumentField must be a ${this.model.name} instance.`);
+  }
+
+  /* -------------------------------------------- */
+
+  /** @inheritDoc */
+  _validateType(value) {
+    if ( !this.options.fallback ) super._validateType(value);
+  }
+
+  /* -------------------------------------------- */
+
+  /** @override */
+  initialize(value, model, options={}) {
+    if ( this.idOnly ) return this.options.fallback || foundry.data.validators.isValidId(value) ? value : null;
+    const collection = model.parent?.[this.model.metadata.collection];
+    return () => {
+      const document = collection?.get(value);
+      if ( !document ) return this.options.fallback ? value : null;
+      if ( this.options.fallback ) Object.defineProperty(document, "toString", {
+        value: () => document.name,
+        configurable: true,
+        enumerable: false
+      });
+      return document;
+    };
+  }
+
+  /* -------------------------------------------- */
+
+  /** @inheritDoc */
+  toObject(value) {
+    return value?._id ?? value;
   }
 }

@@ -9,11 +9,11 @@
         </div>
         <div class="document-panel">
             {{#each items as |item|}}
-            <div class="item-container flex-row">
+            <div class="item-container flex-row" data-drag="true" data-doc="{{item.uuid}}">
                 <div class="item-portait flex-col">
                     <img src="{{item.img}}" alt="{{item.name}}">
                 </div>
-                <div class="button-panel" data-doc="{{item.uuid}}">
+                <div class="button-panel">
                     <a class="action-button doc-button" data-action="deleteDoc">
                         <i class="fa-solid fa-trash"></i>
                     </a>
