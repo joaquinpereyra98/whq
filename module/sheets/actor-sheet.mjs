@@ -387,11 +387,12 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
       const equipCard = event.target.closest(".equipment-card");
       if (equipCard && item.isEquipable) {
         return this._onEquipItem(event, item);
-      }
-      else if (this.actor.system.equipment.ids.has(item._id) && data.initOnEquip) {
+      } else if (
+        this.actor.system.equipment.ids.has(item._id) &&
+        data.initOnEquip
+      ) {
         return this._onUnequipItem(item);
       }
-      console.log(this.actor.system.equipment.ids)
     }
 
     // Create the owned item
@@ -496,13 +497,17 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
   }
 
   async _onUnequipItem(item) {
-    const { bodyParts, ringsParts, otherParts } = this.document.system.equipment;
+    const { bodyParts, ringsParts, otherParts } =
+      this.document.system.equipment;
 
-    if(item.type === "armor" || item.type === 'weapon') {
-      const oldSlot = Object.keys(bodyParts).find(slot => bodyParts[slot].item?._id === item._id);
-      return this.document.update({ [`system.equipment.bodyParts.${oldSlot}.item`]:  null });
+    if (item.type === "armor" || item.type === "weapon") {
+      const oldSlot = Object.keys(bodyParts).find(
+        (slot) => bodyParts[slot].item?._id === item._id
+      );
+      return this.document.update({
+        [`system.equipment.bodyParts.${oldSlot}.item`]: null,
+      });
     }
-
   }
 
   /**
