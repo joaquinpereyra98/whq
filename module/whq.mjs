@@ -11,6 +11,9 @@ Hooks.on("init", () => {
 
     CONFIG.Actor.documentClass = docs.WHQActor;
     CONFIG.Item.documentClass = docs.WHQItem;
+    CONFIG.ActiveEffect.documentClass = docs.WHQEffect;
+    CONFIG.ActiveEffect.legacyTransferral = false;
+    
     CONFIG.Actor.dataModels = {
         elf: dataModels.characterModel
     }

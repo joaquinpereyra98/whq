@@ -3,6 +3,16 @@
  * @extends {Actor}
  */
 export default class WHQActor extends Actor {
+  /* --------------------------------------------- */
+
+  /** @inheritDoc */
+  prepareEmbeddedDocuments() {
+    super.prepareEmbeddedDocuments();
+    Object.entries(this.system.attributes).forEach(([key, attr]) => {
+      this.system.attributes[key].value = attr.value + attr.modifier;
+    });
+  }
+
   getRollData() {
     const system = this.system;
     const data = {

@@ -119,19 +119,6 @@ export default class WHQCharacter extends foundry.abstract.TypeDataModel {
     });
   }
 
-  prepareDerivedData() {
-    Object.values(this.attributes).forEach((attr) => {
-      attr.total =
-        attr.value +
-        attr.modifier +
-        attr.mods.reduce(
-          (sum, { value, mod }) =>
-            typeof value === "number" ? sum + value + mod : sum,
-          0
-        );
-    });
-  }
-
   /**
    * Prepare a data object which defines the data schema used by dice roll commands against this Actor.
    * @returns {object}

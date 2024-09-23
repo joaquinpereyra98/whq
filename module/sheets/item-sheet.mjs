@@ -70,12 +70,12 @@ export default class WHQItemSheet extends api.HandlebarsApplicationMixin(
       icon: "fa-solid fa-dice",
       label: "WHQ.TABS.ITEMS.Roll",
     },
-    /*{
+    {
       id: "effects",
       group: "primary",
       icon: "fa-solid fa-stars",
       label: "WHQ.TABS.ITEMS.Effects",
-    },*/
+    }
   ];
 
   /**
@@ -104,7 +104,7 @@ export default class WHQItemSheet extends api.HandlebarsApplicationMixin(
   /** @override */
   _configureRenderOptions(options) {
     super._configureRenderOptions(options);
-    options.parts = ["header", "tabs", "description"];
+    options.parts = ["header", "tabs", "description", "effects"];
 
     if (this.document.limited) return;
 
@@ -253,7 +253,7 @@ export default class WHQItemSheet extends api.HandlebarsApplicationMixin(
       name: "New Active Effect",
       origin: this.document.uuid,
       disabled: type === "inactive",
-      img: "icons/svg/aura.svg",
+      img: this.document.img ?? "icons/svg/aura.svg",
     };
 
     await aeCls.create(effectData, { parent: this.item });

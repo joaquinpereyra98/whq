@@ -11,6 +11,9 @@ export default class WHQItem extends Item {
   get isEquipped() {
     return this.parent?.system?.equipment.ids.has(this._id) ?? false;
   }
+  get isConsumable() {
+    return this.type === "potion";
+  }
   get isWeapon() {
     return this.type === "weapon";
   }
@@ -23,8 +26,14 @@ export default class WHQItem extends Item {
   }
 
   get isArmor() {
-    return this.type === 'armor';
+    return this.type === "armor";
   }
+
+  /**
+   * ---------------------------------------
+   * 2. STATIC METHODs
+   * ---------------------------------------
+   */
 
   /**
    * Important information on a targeted token.
@@ -57,23 +66,10 @@ export default class WHQItem extends Item {
   }
 
   /**
-   * ---------------------------------------
-   * 2. STATIC METHODs
-   * ---------------------------------------
-   */
-
-  /**
    * @override
    */
   static getDefaultArtwork(itemData) {
-    switch (itemData.type) {
-      case "weapon":
-        return {
-          img: "icons/weapons/swords/greatsword-crossguard-barbed.webp",
-        };
-      default:
-        return { img: this.DEFAULT_ICON };
-    }
+    return { img: this.DEFAULT_ICON };
   }
 
   /**
@@ -158,10 +154,10 @@ export default class WHQItem extends Item {
     const formula = this.getDamageFormula();
 
     const rollDamage = await Roll.create(formula, rollData).evaluate();
-    await rollDamage.toMessage({flavor: "Roll Damage"});
+    await rollDamage.toMessage({ flavor: "Roll Damage" });
 
     const actor = await fromUuid(target.uuid);
-    await actor.applyDamage(rollDamage.total)
+    await actor.applyDamage(rollDamage.total);
   }
 
   /**
@@ -186,7 +182,7 @@ export default class WHQItem extends Item {
       "1d6 + @actor.weaponSkill",
       this.getRollData()
     ).evaluate();
-    await roll.toMessage({flavor: "Roll Melee Attack"});
+    await roll.toMessage({ flavor: "Roll Melee Attack" });
 
     const targets = this.constructor._formatAttackTargets();
     for (const target of targets) {
@@ -205,7 +201,7 @@ export default class WHQItem extends Item {
    * @returns {Promise<void>} - Resolves after rolling attacks and possibly applying damage.
    */
   async _rollRangedAttack() {
-    const rollData = this.getRollData()
+    const rollData = this.getRollData();
 
     if (game.user.targets.size === 0) {
       console.warn(
@@ -214,11 +210,8 @@ export default class WHQItem extends Item {
       return;
     }
 
-    const roll = await Roll.create(
-      "1d6",
-      rollData
-    ).evaluate();
-    await roll.toMessage({flavor: "Roll Ranged Attack"});
+    const roll = await Roll.create("1d6", rollData).evaluate();
+    await roll.toMessage({ flavor: "Roll Ranged Attack" });
 
     const targets = this.constructor._formatAttackTargets();
 

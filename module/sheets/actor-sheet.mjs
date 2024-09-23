@@ -137,10 +137,18 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
    * @param {import("../../foundry/client-esm/applications/_types.mjs").ApplicationRenderContext} context - Shared context provided by _prepareContext.
    */
   _prepareAttributes(context) {
-    context.attributes = foundry.utils.duplicate(this.actor.system.attributes);
-    for (const attribute in context.attributes) {
-      context.attributes[attribute].label =
-        CONFIG.WHQ.attributes[attribute].label;
+    const system = foundry.utils.deepClone(this.actor.system);
+    const attributes = system.attributes;
+    const _attributes = system._source.attributes;
+
+    context.attributes = {}
+    for (const attribute in attributes) {
+      context.attributes[attribute] = {
+        value: _attributes[attribute].value,
+        total: attributes[attribute].value,
+        label: CONFIG.WHQ.attributes[attribute].label,
+        modifier: attributes[attribute].modifier
+      }
     }
   }
 
