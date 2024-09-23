@@ -1,12 +1,12 @@
 <div class="equipment-card flex-container">
     <div class="silhouette-frame">
         <img class="silhouette-img" src="{{slh}}" alt="silhouette">
-        {{#each equipSlots as |slot slotKey|}}
-        <div class="equip-slot {{slot.cssClass}}" data-slot="{{slotKey}}">
+        {{#each bodySlots as |slot slotKey|}}
+        <div class="equip-slot {{slot.cssClass}}" data-slot="{{slot.key}}">
             {{#if slot.item.img}}
-            <img class="fullied-slot item-container" data-doc="{{item.uuid}}" data-drag="true" src="{{slot.item.img}}" alt="{{slotKey}}">
+            <img class="fullied-slot item-container" data-doc="{{slot.item.uuid}}" data-drag="true" src="{{slot.item.img}}" alt="{{slot.ey}}">
             {{else}}
-            <img class="empty-slot" src="systems/whq/assets/ui/little_background_frame.png" alt="{{slotKey}}">
+            <img class="empty-slot" src="systems/whq/assets/ui/{{slot.key}}_background.png" alt="{{slot.key}}">
             {{/if}}
         </div>
         {{/each}}

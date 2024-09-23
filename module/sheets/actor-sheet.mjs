@@ -173,30 +173,35 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
   }
 
   _prepareEquipament(context) {
-    const { equipment } = this.actor.system;
-    const slots = {
-      head: {
-        cssClass: "head-slot",
-        item: equipment.head,
-      },
-      body: {
-        cssClass: "body-slot",
-        item: equipment.body,
-      },
-      leftHand: {
-        cssClass: "left-hand-slot",
-        item: equipment.leftHand,
-      },
-      rightHand: {
-        cssClass: "right-hand-slot",
-        item: equipment.rightHand,
-      },
-      boots: {
-        cssClass: "boots-slot",
-        item: equipment.boots,
-      },
+    const { bodyParts } = this.actor.system.equipment;
+
+    const bodyEntries = Object.fromEntries(
+      Object.entries(bodyParts).map(([key, slot]) => [
+        key,
+        {
+          item: slot.item,
+          cssClass: `${key}-slot`,
+          key,
+        },
+      ])
+    );
+
+    const hands = bodyEntries.hands?.item || null;
+
+    bodyEntries.leftHand = {
+      item: hands,
+      cssClass: "left-hand-slot",
+      key: "hands",
     };
-    context.equipSlots = slots;
+    bodyEntries.rightHand = {
+      item: hands,
+      cssClass: "right-hand-slot",
+      key: "hands",
+    };
+
+    delete bodyEntries.hands;
+
+    context.bodySlots = bodyEntries;
   }
 
   /**
@@ -317,7 +322,7 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
     const doc = this._getEmbeddedDocument(docUuid);
 
     const initOnEquip = !!event.currentTarget.closest(".equipment-card");
-    const dragData = {...doc?.toDragData(), initOnEquip};
+    const dragData = { ...doc?.toDragData(), initOnEquip };
 
     if (!dragData) return;
     event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
@@ -380,12 +385,13 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
     // Handle item sorting within the same Actor
     if (this.actor.uuid === item.parent?.uuid) {
       const equipCard = event.target.closest(".equipment-card");
-      const { equipmentIds } = this.document.system;
-      if (equipCard) {
+      if (equipCard && item.isEquipable) {
         return this._onEquipItem(event, item);
-      } else if (equipmentIds.has(item._id) && data.initOnEquip) {
+      }
+      else if (this.actor.system.equipment.ids.has(item._id) && data.initOnEquip) {
         return this._onUnequipItem(item);
       }
+      console.log(this.actor.system.equipment.ids)
     }
 
     // Create the owned item
@@ -420,47 +426,83 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
    * @returns
    */
   async _onEquipItem(event, item) {
-    const { equipmentIds, equipment } = foundry.utils.deepClone(
-      this.document.system
-    );
-    const slot = event.target.closest(".equip-slot")?.dataset.slot;
-    if (!slot || !["weapon", "armor"].includes(item.type)) return;
+    const { equipment } = this.document.system;
+    const { bodyParts, ids } = equipment;
 
-    const validSlotTypes = {
-      leftHand: ["weapon", "shield"],
-      rightHand: ["weapon", "shield"],
-      head: ["armor", "helmet"],
-      body: ["armor", "body"],
-      boots: ["armor", "boots"],
-    };
+    // Identify the slot being interacted with
+    let slot = event.target.closest(".equip-slot")?.dataset?.slot;
+    const swordSlot = "sword";
+    const shieldSlot = "shield";
 
-    if (!validSlotTypes[slot]?.includes(item.system?.type || item.type)) return;
+    // Check if the item is currently equipped
+    const isEquipped = ids.has(item._id);
 
-    const update = {};
-    const oldSlot = CONSTANT.equipKeys.find(
-      (key) => equipment[key]?._id === item._id
-    );
+    const shieldItem = bodyParts[shieldSlot]?.item;
+    const swordItem = bodyParts[swordSlot]?.item;
+    const updateData = {};
 
-    if (equipmentIds.has(item._id)) {
-      if (oldSlot === slot) return;
-
-      const isHandSlot =
-        ["leftHand", "rightHand"].includes(oldSlot) ||
-        ["leftHand", "rightHand"].includes(slot);
-      update[oldSlot] = isHandSlot ? equipment[slot] : null;
+    //  Case: If the item is armor, update the item.system.type slot directly
+    if (item.type === "armor") {
+      const armorSlot = `system.equipment.bodyParts.${item.system.type}.item`;
+      updateData[armorSlot] = item;
+      return this.document.update(updateData);
     }
 
-    update[slot] = item;
-    return this.document.update({ "system.equipment": update });
+    // Case 1: Weapon is not equipped and dropped in any slot other than sword/shield
+    if (!isEquipped && slot !== swordSlot && slot !== shieldSlot) {
+      slot = swordSlot;
+      updateData[`system.equipment.bodyParts.${slot}.item`] = item;
+    }
+
+    //Case 1.5: weapons is equipped and dropped in any slot other than sword/shield
+    if (isEquipped && slot !== swordSlot && slot !== shieldSlot) {
+      return;
+    }
+
+    // Case 2: Weapon equipped in sword slot and dropped in shield slot, shield slot has another weapon
+    else if (
+      isEquipped &&
+      slot === shieldSlot &&
+      shieldItem?.type === "weapon"
+    ) {
+      // Swap sword and shield items
+      updateData[`system.equipment.bodyParts.${shieldSlot}.item`] = item;
+      updateData[`system.equipment.bodyParts.${swordSlot}.item`] = shieldItem;
+    }
+
+    // Case 3: Weapon equipped in shield slot and dropped in sword slot, sword slot has another weapon
+    else if (isEquipped && slot === swordSlot && swordItem?.type === "weapon") {
+      // Swap sword and shield items
+      updateData[`system.equipment.bodyParts.${swordSlot}.item`] = item;
+      updateData[`system.equipment.bodyParts.${shieldSlot}.item`] = swordItem;
+    }
+
+    // Case 4: Weapon dropped in the shield slot
+    else if (slot === shieldSlot) {
+      if (isEquipped) {
+        // Clear the previous equipped slot
+        const previousSlot =
+          swordItem?._id === item._id ? swordSlot : shieldSlot;
+        updateData[`system.equipment.bodyParts.${previousSlot}.item`] = null;
+      }
+      updateData[`system.equipment.bodyParts.${shieldSlot}.item`] = item;
+    }
+    // Default case: Place the weapon in the specified slot
+    else {
+      updateData[`system.equipment.bodyParts.${slot}.item`] = item;
+    }
+
+    return this.document.update(updateData);
   }
 
   async _onUnequipItem(item) {
-    const { equipment } = foundry.utils.deepClone(this.document.system);
-    const oldSlot = CONSTANT.equipKeys.find(
-      (key) => equipment[key]?._id === item._id
-    );
+    const { bodyParts, ringsParts, otherParts } = this.document.system.equipment;
 
-    return this.document.update({ "system.equipment": { [oldSlot]: null } });
+    if(item.type === "armor" || item.type === 'weapon') {
+      const oldSlot = Object.keys(bodyParts).find(slot => bodyParts[slot].item?._id === item._id);
+      return this.document.update({ [`system.equipment.bodyParts.${oldSlot}.item`]:  null });
+    }
+
   }
 
   /**

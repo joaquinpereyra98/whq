@@ -4,6 +4,13 @@ export default class WHQItem extends Item {
    * 1. GETTERS
    * ---------------------------------------
    */
+
+  get isEquipable() {
+    return this.isWeapon || this.isArmor;
+  }
+  get isEquipped() {
+    return this.parent?.system?.equipment.ids.has(this._id) ?? false;
+  }
   get isWeapon() {
     return this.type === "weapon";
   }
@@ -15,7 +22,7 @@ export default class WHQItem extends Item {
     return this.isWeapon && this.system?.type === "ranged";
   }
 
-  get isAmor() {
+  get isArmor() {
     return this.type === 'armor';
   }
 

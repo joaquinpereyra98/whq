@@ -2,9 +2,8 @@ import {
   defineAttributeField,
   defineBarField,
   defineEquipmentField,
+  defineRingsFields,
 } from "./common.mjs";
-
-import CONSTANT from "../constants.mjs";
 
 export default class WHQCharacter extends foundry.abstract.TypeDataModel {
   /* -------------------------------------------- */
@@ -55,11 +54,23 @@ export default class WHQCharacter extends foundry.abstract.TypeDataModel {
       }),
 
       equipment: new SchemaField({
-        head: defineEquipmentField(),
-        body: defineEquipmentField(),
-        leftHand: defineEquipmentField(),
-        rightHand: defineEquipmentField(),
-        boots: defineEquipmentField(),
+        bodyParts: new SchemaField({
+          head: defineEquipmentField(),
+          helmet: defineEquipmentField(),
+          body: defineEquipmentField(),
+          cloak: defineEquipmentField(),
+          belt: defineEquipmentField(),
+          hands: defineEquipmentField(),
+          sword: defineEquipmentField(),
+          shield: defineEquipmentField(),
+          boots: defineEquipmentField(),
+        }),
+        ringsParts: defineRingsFields(),
+        otherParts: new SchemaField({
+          bracelets0: defineEquipmentField(),
+          bracelets1: defineEquipmentField(),
+          amulet: defineEquipmentField(),
+        }),
       }),
     };
   }
@@ -91,19 +102,20 @@ export default class WHQCharacter extends foundry.abstract.TypeDataModel {
     this.details.title = getTitleByLevel(level);
 
     const equipmentIds = new Set();
-    CONSTANT.equipKeys.forEach((slot) => {
-      const id = this.equipment[slot]?._id;
-      if(equipmentIds.has(id)){
-        console.warn(`Item ${id} is alreasy is equiped on Actor ${this.parent?._id}`)
-      } else if(id) {
-        equipmentIds.add(id)
-      }
-    });
 
-    Object.defineProperty(this, "equipmentIds", {
+    Object.values(this.equipment).forEach(part => {
+        Object.values(part).map(obj => obj.item?._id).forEach(id => {
+          if(id){
+            equipmentIds.add(id)
+          }
+        })
+
+    })
+
+    Object.defineProperty(this.equipment, "ids", {
       value: equipmentIds,
       enumerable: false,
-      writable: false
+      writable: false,
     });
   }
 

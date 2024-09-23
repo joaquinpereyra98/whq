@@ -256,44 +256,62 @@
     position: relative;
 }
 .equipment-card .silhouette-frame .silhouette-img {
-    padding: 1.5em;
+    padding: 5%;
 }
 .equipment-card .silhouette-frame .equip-slot {
     position: absolute;
-    width: 28%;
+    width: 25%;
     display: flex;
     border-image-source: url(../assets/ui/inventory_frame.png);
     border-image-slice: 6 6 6 6 fill;
-    border-image-outset: 0 3px 3px 0;
+    border-image-outset: 0;
 }
-.equipment-card .silhouette-frame .equip-slot img {
-    background: url(../assets/ui/little_background_frame.png);
-}
-.equipment-card .silhouette-frame .equip-slot .empty-slot {
-    opacity: 0.7;
-}
+
 .equipment-card .silhouette-frame .equip-slot.head-slot{
-    right: 35%;
+    left: 20%;
     top: 5%;
 }
 
+.equipment-card .silhouette-frame .equip-slot.helmet-slot{
+    right: 20%;
+    top: 5%;
+}
 .equipment-card .silhouette-frame .equip-slot.body-slot{
-    right: 35%;
-    top: 25%;
+    right: 20%;
+    top: 20%;
+}
+.equipment-card .silhouette-frame .equip-slot.cloak-slot {
+    left: 20%;
+    top: 20%;
+}
+
+.equipment-card .silhouette-frame .equip-slot.belt-slot {
+    left: 37.5%;
+    top: 38%;
 }
 
 .equipment-card .silhouette-frame .equip-slot.left-hand-slot {
-    top: 40%;
-    left: 5%;
+    top: 37.5%;
+    left: 3%;
 }
 
 .equipment-card .silhouette-frame .equip-slot.right-hand-slot {
-    top: 40%;
-    right: 5%;
+    top: 37.5%;
+    right: 3%;
+}
+
+.equipment-card .silhouette-frame .equip-slot.sword-slot {
+    top: 50%;
+    left: 3%;
+}
+
+.equipment-card .silhouette-frame .equip-slot.shield-slot {
+    top: 50%;
+    right: 3%;
 }
 .equipment-card .silhouette-frame .equip-slot.boots-slot{
-    right: 35%;
-    bottom: 10%;
+    right: 39%;
+    bottom: 5%;
 }
 /*========================= BODY SHEET =========================*/
 .whq .sheet-body {

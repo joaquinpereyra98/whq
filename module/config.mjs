@@ -59,7 +59,7 @@ WHQ.attributes = {
     }
   }
   
-WHQ.silhouette = `${CONSTANT.systemPath("assets/ui/silhouette_character.png")}`;
+WHQ.silhouette = `${CONSTANT.systemPath("assets/ui/silhouette_character.svg")}`;
 
 WHQ.weaponTypes = {
   melee: "Melee Weapon",
@@ -67,11 +67,11 @@ WHQ.weaponTypes = {
 }
 
 WHQ.armorTypes = {
-  body: "Armour",
-  boots: "Boots",
   helmet: "Helmet",
-  fur: "Fur",
-  shield: "Shield"
+  body: "Armour",
+  hands: "Gauntlets", 
+  shield: "Shield",
+  boots: "Boots",
 }
 
 export default WHQ;

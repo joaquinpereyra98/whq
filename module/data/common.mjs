@@ -70,13 +70,22 @@ export function defineBarField(val = 0, max = null) {
  * @returns {import (../../foundry/common/data/fields.mjs).ForeignDocumentField}
  */
 export function defineEquipmentField() {
-  return new LocalDocumentField(foundry.documents.BaseItem, {
-    required: true,
-    fallback: true,
-    idOnly: false
+  return new SchemaField({
+    item: new LocalDocumentField(foundry.documents.BaseItem, {
+      required: true,
+      fallback: true,
+      idOnly: false
+    })
   });
 }
 
+export function defineRingsFields() {
+  const fields = {};
+  for (let index = 0; index < 8; index++) {
+    fields[`ring${index}`] = defineEquipmentField();
+  };
+  return new SchemaField(fields);
+}
 /**
  * Special case StringField which represents a formula.
  * copy form DnD5e

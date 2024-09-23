@@ -248,7 +248,7 @@ export default class WHQItemSheet extends api.HandlebarsApplicationMixin(
     event.preventDefault();
     const aeCls = getDocumentClass("ActiveEffect");
     const { type } = target.dataset;
-    console.log(type === "inactive");
+
     const effectData = {
       name: "New Active Effect",
       origin: this.document.uuid,
