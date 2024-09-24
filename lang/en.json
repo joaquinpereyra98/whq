@@ -17,7 +17,8 @@
                 "Weapons": "Weapons",
                 "Armors": "Armors",
                 "Equipments": "Equipments",
-                "Consumables": "Consumables"
+                "Consumables": "Consumables",
+                "Effects": "Effects"
             },
             "ITEMS": {
                 "Roll": "Roll Formula",

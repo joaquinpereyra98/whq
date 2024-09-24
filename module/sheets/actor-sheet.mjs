@@ -1,4 +1,5 @@
 import CONSTANT from "../constants.mjs";
+import { prepareActiveEffectCategories } from "./common.mjs";
 const { api, sheets } = foundry.applications;
 
 /**
@@ -32,6 +33,10 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
       useDoc: this._onUseDoc,
       editDoc: this._onEditDoc,
       initWounds: this._onInitWounds,
+      createEffect: this._onCreateEffect,
+      ableEffect: this._onAbleEffect,
+      deleteEffect: this._onDeleteEffect,
+      editEffect: this._onEditEffect
     },
     form: { submitOnChange: true },
     window: {
@@ -76,7 +81,11 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
     consumables: {
       template: CONSTANT.actorParts("consumables-part.hbs"),
       classes: ["body-part"],
-    }
+    },
+    effects: {
+      template: CONSTANT.actorParts("effects-part.hbs"),
+      classes: ["body-part"],
+    },
   };
 
   /**
@@ -106,8 +115,14 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
       id: "consumables",
       group: "primary",
       icon: "fa-solid fa-flask-round-potion",
-      label: "WHQ.TABS.ACTORS.Consumables"
-    }
+      label: "WHQ.TABS.ACTORS.Consumables",
+    },
+    {
+      id: "effects",
+      group: "primary",
+      icon: "fa-solid fa-stars",
+      label: "WHQ.TABS.ACTORS.Effects",
+    },
   ];
 
   /**
@@ -196,6 +211,10 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
       case "consumables":
         context.tab = context.tabs.consumables;
         context.items = this.actor.itemTypes.consumable;
+        break;
+      case "effects":
+        context.tab = context.tabs.effects;
+        context.effects = prepareActiveEffectCategories(this.document.effects);
         break;
       case "equipment":
         context.slh = CONFIG.WHQ.silhouette;
@@ -537,19 +556,19 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
     // Identify the slot being interacted with
     let slot = event.target.closest(".equip-slot")?.dataset?.slot;
 
-    if(!slot) {
-      if(item.system.type === "ring") {
+    if (!slot) {
+      if (item.system.type === "ring") {
         slot = Object.keys(ringsParts).find(
           (key) => ringsParts[key].item === null
         );
-      } else if(item.system.type === "bracelet") {
+      } else if (item.system.type === "bracelet") {
         slot = Object.keys(otherParts).find(
-          (key) => (key.startsWith("bracelets") && otherParts[key].item === null)
+          (key) => key.startsWith("bracelets") && otherParts[key].item === null
         );
       } else {
         slot = "amulet";
       }
-      if(!slot) return;
+      if (!slot) return;
     }
     const isEquipped = ids.has(item._id);
     const updateData = {};
@@ -583,15 +602,15 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
 
   async _onUnequipItem(item) {
     const { equipment } = this.document.system;
-    
+
     const partsMap = {
       bodyParts: ["armor", "weapon", "head", "cloak", "belt"],
       ringsParts: ["ring"],
-      otherParts: ["bracelet", "amulet"] // Assuming other items fall here by default
+      otherParts: ["bracelet", "amulet"], // Assuming other items fall here by default
     };
-  
+
     let part, oldSlot;
-    
+
     // Determine which part the item belongs to
     for (let [key, types] of Object.entries(partsMap)) {
       if (types.includes(item.type) || types.includes(item.system.type)) {
@@ -599,19 +618,18 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
         break;
       }
     }
-    
+
     // Find the slot in the determined part
     const parts = equipment[part] || equipment.otherParts;
     oldSlot = Object.keys(parts).find(
       (slot) => parts[slot].item?._id === item._id
     );
-  
+
     // Update the document to unequip the item
     return this.document.update({
       [`system.equipment.${part}.${oldSlot}.item`]: null,
     });
   }
-  
 
   /**
    * Handle the final creation of dropped Item data on the Actor.
@@ -781,5 +799,58 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
     const uuid = target.closest(".item-container")?.dataset.doc;
     const doc = await fromUuid(uuid);
     doc.sheet.render(true);
+  }
+  /**
+   * Handle creating a new Owned Item or ActiveEffect for the actor using initial data defined in the HTML dataset
+   * @this DrawSteelItemSheet
+   * @param {PointerEvent} event   The originating click event
+   * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
+   * @private
+   */
+  static async _onCreateEffect(event, target) {
+    event.preventDefault();
+    const aeCls = getDocumentClass("ActiveEffect");
+    const { type } = target.dataset;
+
+    const effectData = {
+      name: "New Active Effect",
+      origin: this.document.uuid,
+      disabled: type === "inactive",
+      img: "icons/svg/aura.svg",
+    };
+    console.log(effectData)
+    await aeCls.create(effectData, { parent: this.document });
+  }
+  /**
+   * Handle for deletec Activee Effects
+   * @param {PointerEvent} event
+   * @param {HTMLElement} target
+   */
+  static async _onDeleteEffect(event, target) {
+    event.preventDefault();
+    const uuid = target.closest(".button-panel")?.dataset.doc;
+    const doc = await fromUuid(uuid);
+
+    await doc.delete();
+  }
+
+  /**
+   * Handle for render Active Effect app
+   * @param {PointerEvent} event
+   * @param {HTMLElement} target
+   */
+  static async _onEditEffect(event, target) {
+    event.preventDefault();
+    const uuid = target.closest(".button-panel")?.dataset.doc;
+    const doc = await fromUuid(uuid);
+    doc.sheet.render(true);
+  }
+
+  static async _onAbleEffect(event, target) {
+    event.preventDefault();
+    
+    const uuid = target.closest(".button-panel")?.dataset.doc;
+    const doc = await fromUuid(uuid);
+    await doc.update({disabled: !doc.disabled});
   }
 }

@@ -127,7 +127,7 @@
     transition: 500ms;
 }
 
-.whq .action-button[data-action="activeEffect"] {
+.whq .action-button[data-action="ableEffect"] {
     opacity: 1;
 }
 

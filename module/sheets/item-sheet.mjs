@@ -20,6 +20,7 @@ export default class WHQItemSheet extends api.HandlebarsApplicationMixin(
       createEffect: this._onCreateEffect,
       editEffect: this._onEditEffect,
       deleteEffect: this._onDeleteEffect,
+      activeEffect: this._onAbleEffect,
     },
     form: { submitOnChange: true },
     window: {
@@ -297,5 +298,13 @@ export default class WHQItemSheet extends api.HandlebarsApplicationMixin(
     const uuid = target.closest(".button-panel")?.dataset.doc;
     const doc = await fromUuid(uuid);
     doc.sheet.render(true);
+  }
+
+  static async _onAbleEffect(event, target) {
+    event.preventDefault();
+    
+    const uuid = target.closest(".button-panel")?.dataset.doc;
+    const doc = await fromUuid(uuid);
+    await doc.update({disabled: !doc.disabled});
   }
 }
