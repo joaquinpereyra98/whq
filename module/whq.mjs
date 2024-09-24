@@ -15,7 +15,9 @@ Hooks.on("init", () => {
     CONFIG.ActiveEffect.legacyTransferral = false;
     
     CONFIG.Actor.dataModels = {
-        elf: dataModels.characterModel
+        elf: dataModels.characterModel,
+        barbarian: dataModels.characterModel,
+        dwarf: dataModels.characterModel
     }
     CONFIG.Item.dataModels = {
       weapon: dataModels.weaponModel,

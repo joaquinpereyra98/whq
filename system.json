@@ -52,6 +52,12 @@
     "Actor": {
       "elf": {
         "htmlFields": []
+      },
+      "barbarian": {
+        "htmlFields": []
+      },
+      "dwarf": {
+        "htmlFields": []
       }
     },
     "Item" :{

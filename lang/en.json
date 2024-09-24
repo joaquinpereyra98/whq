@@ -1,7 +1,9 @@
 {
     "TYPES": {
         "Actor": {
-            "elf": "Elf"
+            "elf": "Elf",
+            "barbarian": "Barbarian",
+            "dwarf": "Dwarf"
         },
         "Item": {
             "weapon": "Weapon",

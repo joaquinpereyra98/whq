@@ -18,6 +18,34 @@ WHQ.actors = {
       },
     },
   },
+  barbarian: {
+    woundsRoll: "1d6 + 9",
+    initialValues: {
+      initiative: 3,
+      attributes: {
+        weaponSkill:{value: 3} ,
+        ballisticSkill:{value: 5} ,
+        strength:{value: 4} ,
+        toughness:{value: 3} ,
+        willpower:{value: 3} ,
+        pin:{value: 6} ,
+      },
+    }
+  },
+  dwarf: {
+    woundsRoll: "1d6 + 8",
+    initialValues: {
+      initiative: 2,
+      attributes: {
+        weaponSkill:{value: 4} ,
+        ballisticSkill:{value: 5} ,
+        strength:{value: 3} ,
+        toughness:{value: 4} ,
+        willpower:{value: 4} ,
+        pin:{value: 5} ,
+      },
+    }
+  }
 };
 
 WHQ.attributes = {
