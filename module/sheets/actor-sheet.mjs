@@ -69,6 +69,10 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
       template: CONSTANT.actorParts("armors-part.hbs"),
       classes: ["body-part"],
     },
+    equipments: {
+      template: CONSTANT.actorParts("equipments-part.hbs"),
+      classes: ["body-part"],
+    },
   };
 
   /**
@@ -87,6 +91,12 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
       group: "primary",
       icon: "fa-solid fa-helmet-battle",
       label: "WHQ.TABS.ACTORS.Armors",
+    },
+    {
+      id: "equipments",
+      group: "primary",
+      icon: "fa-solid fa-backpack",
+      label: "WHQ.TABS.ACTORS.Equipments",
     },
   ];
 
@@ -141,14 +151,14 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
     const attributes = system.attributes;
     const _attributes = system._source.attributes;
 
-    context.attributes = {}
+    context.attributes = {};
     for (const attribute in attributes) {
       context.attributes[attribute] = {
         value: _attributes[attribute].value,
         total: attributes[attribute].value,
         label: CONFIG.WHQ.attributes[attribute].label,
-        modifier: attributes[attribute].modifier
-      }
+        modifier: attributes[attribute].modifier,
+      };
     }
   }
 
@@ -169,6 +179,9 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
         context.tab = context.tabs.armors;
         context.items = this.actor.itemTypes.armor;
         break;
+      case "equipments":
+        context.tab = context.tabs.equipments;
+        context.items = this.actor.itemTypes.equipment;
       case "equipment":
         context.slh = CONFIG.WHQ.silhouette;
         this._prepareEquipament(context);
@@ -181,35 +194,27 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
   }
 
   _prepareEquipament(context) {
-    const { bodyParts } = this.actor.system.equipment;
+    const { bodyParts, ringsParts, otherParts } = this.actor.system.equipment;
 
-    const bodyEntries = Object.fromEntries(
-      Object.entries(bodyParts).map(([key, slot]) => [
+    const mapSlots = (parts) =>
+      Object.entries(parts).map(([key, slot]) => ({
         key,
-        {
-          item: slot.item,
-          cssClass: `${key}-slot`,
-          key,
-        },
-      ])
+        cssClass: `${key}-slot`,
+        item: slot.item,
+      }));
+
+    const bodyEntries = mapSlots(bodyParts);
+    const hands =
+      bodyEntries.find((entry) => entry.key === "hands")?.item || null;
+
+    context.bodySlots = bodyEntries.filter((entry) => entry.key !== "hands");
+    context.bodySlots.push(
+      { item: hands, cssClass: "left-hand-slot", key: "hands" },
+      { item: hands, cssClass: "right-hand-slot", key: "hands" }
     );
 
-    const hands = bodyEntries.hands?.item || null;
-
-    bodyEntries.leftHand = {
-      item: hands,
-      cssClass: "left-hand-slot",
-      key: "hands",
-    };
-    bodyEntries.rightHand = {
-      item: hands,
-      cssClass: "right-hand-slot",
-      key: "hands",
-    };
-
-    delete bodyEntries.hands;
-
-    context.bodySlots = bodyEntries;
+    context.ringSlots = mapSlots(ringsParts);
+    context.otherSlots = mapSlots(otherParts);
   }
 
   /**
@@ -390,21 +395,27 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
     if (!this.actor.isOwner) return false;
     const item = await Item.implementation.fromDropData(data);
 
-    // Handle item sorting within the same Actor
+    // Handle item within the same Actor
     if (this.actor.uuid === item.parent?.uuid) {
       const equipCard = event.target.closest(".equipment-card");
+
       if (equipCard && item.isEquipable) {
-        return this._onEquipItem(event, item);
+        const otherTypes = ["ring", "bracelet", "amulet"];
+
+        if (otherTypes.includes(item.system.type))
+          return this._onOtherEquipItem(event, item);
+
+        return this._onBodyEquipItem(event, item);
       } else if (
         this.actor.system.equipment.ids.has(item._id) &&
         data.initOnEquip
       ) {
         return this._onUnequipItem(item);
       }
+    } else {
+      // Create the owned item
+      return this._onDropItemCreate(item, event);
     }
-
-    // Create the owned item
-    //return this._onDropItemCreate(item, event);
   }
 
   /**
@@ -434,7 +445,7 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
    * @param {Item} item
    * @returns
    */
-  async _onEquipItem(event, item) {
+  async _onBodyEquipItem(event, item) {
     const { equipment } = this.document.system;
     const { bodyParts, ids } = equipment;
 
@@ -451,7 +462,7 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
     const updateData = {};
 
     //  Case: If the item is armor, update the item.system.type slot directly
-    if (item.type === "armor") {
+    if (item.type === "armor" || item.type === "equipment") {
       const armorSlot = `system.equipment.bodyParts.${item.system.type}.item`;
       updateData[armorSlot] = item;
       return this.document.update(updateData);
@@ -504,19 +515,88 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
     return this.document.update(updateData);
   }
 
-  async _onUnequipItem(item) {
-    const { bodyParts, ringsParts, otherParts } =
-      this.document.system.equipment;
+  async _onOtherEquipItem(event, item) {
+    const { equipment } = this.document.system;
+    const { ringsParts, otherParts, ids } = equipment;
 
-    if (item.type === "armor" || item.type === "weapon") {
-      const oldSlot = Object.keys(bodyParts).find(
-        (slot) => bodyParts[slot].item?._id === item._id
-      );
-      return this.document.update({
-        [`system.equipment.bodyParts.${oldSlot}.item`]: null,
-      });
+    // Identify the slot being interacted with
+    let slot = event.target.closest(".equip-slot")?.dataset?.slot;
+
+    if(!slot) {
+      if(item.system.type === "ring") {
+        slot = Object.keys(ringsParts).find(
+          (key) => ringsParts[key].item === null
+        );
+      } else if(item.system.type === "bracelet") {
+        slot = Object.keys(otherParts).find(
+          (key) => (key.startsWith("bracelets") && otherParts[key].item === null)
+        );
+      } else {
+        slot = "amulet";
+      }
+      if(!slot) return;
     }
+    const isEquipped = ids.has(item._id);
+    const updateData = {};
+
+    if (item.system.type === "ring") {
+      //Case 1: Ring not equiped droped on a slot empty or not.
+      if (!isEquipped) {
+        updateData[`system.equipment.ringsParts.${slot}.item`] = item;
+      }
+      //Case 2: Ring equipped droppem on other slot
+      else {
+        const oldSlot = Object.keys(ringsParts).find(
+          (key) => ringsParts[key].item?._id === item._id
+        );
+        const itemOnSlot = ringsParts[slot]?.item;
+        updateData[`system.equipment.ringsParts.${slot}.item`] = item;
+        updateData[`system.equipment.ringsParts.${oldSlot}.item`] = itemOnSlot;
+      }
+    } else {
+      if (item.system.type === "bracelet" && isEquipped) {
+        const oldSlot = Object.keys(otherParts).find(
+          (key) => otherParts[key].item?._id === item._id
+        );
+        const itemOnSlot = otherParts[slot]?.item;
+        updateData[`system.equipment.otherParts.${slot}.item`] = item;
+        updateData[`system.equipment.otherParts.${oldSlot}.item`] = itemOnSlot;
+      } else updateData[`system.equipment.otherParts.${slot}.item`] = item;
+    }
+    return this.document.update(updateData);
   }
+
+  async _onUnequipItem(item) {
+    const { equipment } = this.document.system;
+    
+    const partsMap = {
+      bodyParts: ["armor", "weapon", "head", "cloak", "belt"],
+      ringsParts: ["ring"],
+      otherParts: ["bracelet", "amulet"] // Assuming other items fall here by default
+    };
+  
+    let part, oldSlot;
+    
+    // Determine which part the item belongs to
+    for (let [key, types] of Object.entries(partsMap)) {
+      if (types.includes(item.type) || types.includes(item.system.type)) {
+        part = key;
+        break;
+      }
+    }
+    
+    // Find the slot in the determined part
+    const parts = equipment[part] || equipment.otherParts;
+    oldSlot = Object.keys(parts).find(
+      (slot) => parts[slot].item?._id === item._id
+    );
+  
+    // Update the document to unequip the item
+    return this.document.update({
+      [`system.equipment.${part}.${oldSlot}.item`]: null,
+    });
+  }
+  
 
   /**
    * Handle the final creation of dropped Item data on the Actor.

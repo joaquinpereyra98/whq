@@ -112,8 +112,6 @@ export default class WHQItemSheet extends api.HandlebarsApplicationMixin(
       case "weapon":
         options.parts.push("formula");
         break;
-      case "armor":
-        break;
     }
 
     this._tabs = options.parts;

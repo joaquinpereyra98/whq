@@ -72,6 +72,7 @@
 .whq [data-drag="true"] {
     cursor: grab;
 }
+
 /*=========================== GENERAL ELEMENTS ============================*/
 
 .whq h1,
@@ -90,6 +91,7 @@
     font-family: var(--whq-font-label);
     font-size: large;
 }
+
 .whq a .whq-label {
     cursor: pointer;
     margin: 5px 0;
@@ -252,34 +254,42 @@
     border-radius: 8px;
     padding: 10px;
 }
+
 .equipment-card .silhouette-frame {
     position: relative;
 }
+
 .equipment-card .silhouette-frame .silhouette-img {
     padding: 5%;
 }
+
+.equipment-card .equip-slot {
+    border-image-source: url(../assets/ui/inventory_frame.png);
+    border-image-slice: 6 6 6 6 fill;
+    border-image-outset: 2px;
+}
+
 .equipment-card .silhouette-frame .equip-slot {
     position: absolute;
     width: 25%;
     display: flex;
-    border-image-source: url(../assets/ui/inventory_frame.png);
-    border-image-slice: 6 6 6 6 fill;
-    border-image-outset: 0;
 }
 
-.equipment-card .silhouette-frame .equip-slot.head-slot{
+.equipment-card .silhouette-frame .equip-slot.head-slot {
     left: 20%;
     top: 5%;
 }
 
-.equipment-card .silhouette-frame .equip-slot.helmet-slot{
+.equipment-card .silhouette-frame .equip-slot.helmet-slot {
     right: 20%;
     top: 5%;
 }
-.equipment-card .silhouette-frame .equip-slot.body-slot{
+
+.equipment-card .silhouette-frame .equip-slot.body-slot {
     right: 20%;
     top: 20%;
 }
+
 .equipment-card .silhouette-frame .equip-slot.cloak-slot {
     left: 20%;
     top: 20%;
@@ -309,10 +319,35 @@
     top: 50%;
     right: 3%;
 }
-.equipment-card .silhouette-frame .equip-slot.boots-slot{
+
+.equipment-card .silhouette-frame .equip-slot.boots-slot {
     right: 39%;
     bottom: 5%;
 }
+
+.equipment-container h3 {
+    margin: 5px 0;
+}
+
+.equipment-card .rings-container {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(2em, 1fr));
+    gap: 4px;
+    grid-auto-rows: minmax(2em, auto);
+}
+
+.equipment-card .rings-container .equip-slot,
+.equipment-card .other-equips-container .equip-slot {
+    border-image-outset: 0px;
+}
+
+.equipment-card .other-equips-container {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(35px, 1fr));
+    gap: 5px;
+    grid-auto-rows: minmax(2em, auto);
+}
+
 /*========================= BODY SHEET =========================*/
 .whq .sheet-body {
     width: 70%;

@@ -5,7 +5,8 @@
         },
         "Item": {
             "weapon": "Weapon",
-            "armor": "Armor"
+            "armor": "Armor",
+            "equipment": "Equipment"
         }
     },
     "WHQ": {
@@ -13,7 +14,8 @@
             "ACTORS": {
                 "Summary": "Summary",
                 "Weapons": "Weapons",
-                "Armors": "Armors"
+                "Armors": "Armors",
+                "Equipments": "Equipments"
             },
             "ITEMS": {
                 "Roll": "Roll Formula",

@@ -1,10 +1,11 @@
 <div class="equipment-card flex-container">
     <div class="silhouette-frame">
         <img class="silhouette-img" src="{{slh}}" alt="silhouette">
-        {{#each bodySlots as |slot slotKey|}}
+        {{#each bodySlots as |slot|}}
         <div class="equip-slot {{slot.cssClass}}" data-slot="{{slot.key}}">
             {{#if slot.item.img}}
-            <img class="fullied-slot item-container" data-doc="{{slot.item.uuid}}" data-drag="true" src="{{slot.item.img}}" alt="{{slot.ey}}">
+            <img class="fullied-slot item-container" data-doc="{{slot.item.uuid}}" data-drag="true"
+                src="{{slot.item.img}}" alt="{{slot.ey}}">
             {{else}}
             <img class="empty-slot" src="systems/whq/assets/ui/{{slot.key}}_background.png" alt="{{slot.key}}">
             {{/if}}
@@ -13,6 +14,31 @@
     </div>
 
     <div class="equipment-container">
-
+        <h3>Rings</h3>
+        <div class="rings-container">
+            {{#each ringSlots as |slot|}}
+            <div class="equip-slot {{slot.cssClass}}" data-slot="{{slot.key}}">
+                {{#if slot.item.img}}
+                <img class="fullied-slot item-container" data-doc="{{slot.item.uuid}}" data-drag="true"
+                    src="{{slot.item.img}}" alt="{{slot.ey}}">
+                {{else}}
+                <img class="empty-slot" src="systems/whq/assets/ui/ring_background.png" alt="{{slot.key}}">
+                {{/if}}
+            </div>
+            {{/each}}
+        </div>
+        <h3>Others</h3>
+        <div class="other-equips-container">
+            {{#each otherSlots as |slot|}}
+            <div class="equip-slot {{slot.cssClass}}" data-slot="{{slot.key}}">
+                {{#if slot.item.img}}
+                <img class="fullied-slot item-container" data-doc="{{slot.item.uuid}}" data-drag="true"
+                    src="{{slot.item.img}}" alt="{{slot.ey}}">
+                {{else}}
+                <img class="empty-slot" src="systems/whq/assets/ui/{{ifThen (eq slot.key 'amulet') 'neck' 'bracers'}}_background.png" alt="{{slot.key}}">
+                {{/if}}
+            </div>
+            {{/each}}
+        </div>
     </div>
 </div>

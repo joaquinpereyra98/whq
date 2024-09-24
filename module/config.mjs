@@ -74,4 +74,13 @@ WHQ.armorTypes = {
   boots: "Boots",
 }
 
+WHQ.equipmentTypes = {
+  head: "Crown",
+  ring: "Ring",
+  cloak: "Cloak",
+  belt: "Belt",
+  bracelet: "Bracelets",
+  amulet: "Amulet"
+}
+
 export default WHQ;

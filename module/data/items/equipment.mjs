@@ -1,6 +1,6 @@
 import { FormulaField } from "../common.mjs";
 
-export default class WHQArmor extends foundry.abstract.TypeDataModel {
+export default class WHQEquipment extends foundry.abstract.TypeDataModel {
   /**
    * @override
    * @returns { import("../../../foundry/common/abstract/data.mjs").DataSchema }
@@ -25,10 +25,9 @@ export default class WHQArmor extends foundry.abstract.TypeDataModel {
 
       //Combat
       type: new StringField({
-        choices: CONFIG.WHQ.armorTypes,
+        choices: CONFIG.WHQ.equipmentTypes,
       }),
 
-      
     };
   }
 }
