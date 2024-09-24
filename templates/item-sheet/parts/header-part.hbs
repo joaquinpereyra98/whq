@@ -12,14 +12,30 @@
             }}
         </div>
         <div class="header-resources flex-row">
-            <div class="resource-container flex-col">
+            {{#if (eq item.type 'consumable')}}
+            <div class="resource-container flex-col flex-1">
+                <label class="whq-label">Uses</label>
+                <div class="wounds-bar resource-bar flex-row">
+                    <input class="bar-input-value" type="number" name="system.uses.value" value="{{system.uses.value}}">
+                    <input class="bar-input-max" type="number" name="system.uses.max" value="{{system.uses.max}}">
+                </div>
+            </div>
+            <div class="resource-container flex-col flex-1">
+                <label class="whq-label">Auto Destroy</label>
+                {{formInput systemFields.autoDestroy
+                value=item.system.autoDestroy
+                }}
+            </div>
+            {{else}}
+            <div class="resource-container flex-col flex-1">
                 <label class="whq-label">Type</label>
                 {{formInput systemFields.type
                 value=item.system.type
                 placeholder="Type"
                 }}
             </div>
-            <div class="resource-container flex-col">
+            {{/if}}
+            <div class="resource-container flex-col flex-1">
                 <label class="whq-label">Price</label>
                 {{formInput systemFields.price
                 value=item.system.price

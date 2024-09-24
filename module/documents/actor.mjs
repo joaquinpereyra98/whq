@@ -63,13 +63,12 @@ export default class WHQActor extends Actor {
    * @param {Object} options
    */
   async applyHeal(heal, options) {
-    const maxWounds = this.system.wounds.max;
-    const actualWounds = this.system.wounds.value;
-
+    const { max, value } = this.system.wounds;
+    console.log(heal)
     if (typeof heal === "string") {
       switch (heal) {
         case "all":
-          heal = maxWounds;
+          heal = max;
           break;
         default:
           console.error("heal is not a valid string");
@@ -79,7 +78,8 @@ export default class WHQActor extends Actor {
       //Make damage a integer positive
       heal = Math.floor(Math.abs(heal));
     }
-    const newWounds = Math.min(maxWounds, actualWounds + heal);
+    const newWounds = Math.min(max, value + heal);
+    console.log(newWounds, heal)
     await this.update({ "system.wounds.value": newWounds });
   }
 }

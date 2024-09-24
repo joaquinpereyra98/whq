@@ -1,5 +1,3 @@
-import { FormulaField } from "../common.mjs";
-
 export default class WHQArmor extends foundry.abstract.TypeDataModel {
   /**
    * @override

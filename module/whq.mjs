@@ -20,7 +20,8 @@ Hooks.on("init", () => {
     CONFIG.Item.dataModels = {
       weapon: dataModels.weaponModel,
       armor: dataModels.armorModel,
-      equipment: dataModels.equipmentModel
+      equipment: dataModels.equipmentModel,
+      consumable: dataModels.consumableMode
     }
 
     Actors.unregisterSheet('core', ActorSheet);

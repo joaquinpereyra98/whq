@@ -45,6 +45,8 @@ export function defineAttributeField(initial = 0, nullable = false) {
 }
 /**
  * Create a new instance of SchemaField with a NumberField of max and value.
+ * @param {Number} val
+ * @param {Number|Null} max
  * @returns { import ("../../foundry/common/data/fields.mjs").SchemaField}
  */
 export function defineBarField(val = 0, max = null) {

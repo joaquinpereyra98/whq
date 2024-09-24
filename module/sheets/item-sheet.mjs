@@ -52,6 +52,9 @@ export default class WHQItemSheet extends api.HandlebarsApplicationMixin(
     effects: {
       template: CONSTANT.itemParts("effects.hbs"),
     },
+    consume: {
+      template: CONSTANT.itemParts("consume.hbs")
+    }
   };
   /**
    * Available tabs for the sheet.
@@ -71,11 +74,17 @@ export default class WHQItemSheet extends api.HandlebarsApplicationMixin(
       label: "WHQ.TABS.ITEMS.Roll",
     },
     {
+      id: "consume",
+      group: "primary",
+      icon: "fa-solid fa-flask-round-potion",
+      label: "WHQ.TABS.ITEMS.Consume"
+    },
+    {
       id: "effects",
       group: "primary",
       icon: "fa-solid fa-stars",
       label: "WHQ.TABS.ITEMS.Effects",
-    }
+    },
   ];
 
   /**
@@ -112,6 +121,9 @@ export default class WHQItemSheet extends api.HandlebarsApplicationMixin(
       case "weapon":
         options.parts.push("formula");
         break;
+      case "consumable":
+        options.parts.push("consume");
+      break;
     }
 
     this._tabs = options.parts;
@@ -173,6 +185,11 @@ export default class WHQItemSheet extends api.HandlebarsApplicationMixin(
         context.tab = context.tabs.effects;
         context.effects = prepareActiveEffectCategories(this.document.effects);
         break;
+      case "consume": 
+        context.tab = context.tabs.consume;
+        const { applyHeal, healAll } = this.item.system.heal;
+        context.disableHealFormula = (!applyHeal || healAll);
+      break;
       default:
         break;
     }

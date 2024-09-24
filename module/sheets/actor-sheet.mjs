@@ -73,6 +73,10 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
       template: CONSTANT.actorParts("equipments-part.hbs"),
       classes: ["body-part"],
     },
+    consumables: {
+      template: CONSTANT.actorParts("consumables-part.hbs"),
+      classes: ["body-part"],
+    }
   };
 
   /**
@@ -98,6 +102,12 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
       icon: "fa-solid fa-backpack",
       label: "WHQ.TABS.ACTORS.Equipments",
     },
+    {
+      id: "consumables",
+      group: "primary",
+      icon: "fa-solid fa-flask-round-potion",
+      label: "WHQ.TABS.ACTORS.Consumables"
+    }
   ];
 
   /**
@@ -182,6 +192,11 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
       case "equipments":
         context.tab = context.tabs.equipments;
         context.items = this.actor.itemTypes.equipment;
+        break;
+      case "consumables":
+        context.tab = context.tabs.consumables;
+        context.items = this.actor.itemTypes.consumable;
+        break;
       case "equipment":
         context.slh = CONFIG.WHQ.silhouette;
         this._prepareEquipament(context);

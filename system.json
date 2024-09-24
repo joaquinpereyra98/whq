@@ -63,6 +63,9 @@
       },
       "equipment": {
         "htmlFields": ["description"]
+      },
+      "consumable": {
+        "htmlFields": ["description"]
       }
     }
   },

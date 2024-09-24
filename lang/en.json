@@ -6,7 +6,8 @@
         "Item": {
             "weapon": "Weapon",
             "armor": "Armor",
-            "equipment": "Equipment"
+            "equipment": "Equipment",
+            "consumable": "Consumable"
         }
     },
     "WHQ": {
@@ -15,11 +16,13 @@
                 "Summary": "Summary",
                 "Weapons": "Weapons",
                 "Armors": "Armors",
-                "Equipments": "Equipments"
+                "Equipments": "Equipments",
+                "Consumables": "Consumables"
             },
             "ITEMS": {
                 "Roll": "Roll Formula",
-                "Effects": "Effects"
+                "Effects": "Effects",
+                "Consume": "Consume"
             },
            "Description": "Description"
         },

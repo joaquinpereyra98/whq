@@ -127,6 +127,10 @@
     transition: 500ms;
 }
 
+.whq .action-button[data-action="activeEffect"] {
+    opacity: 1;
+}
+
 .whq .action-button:hover {
     transform: scale(1.1);
     opacity: 1;

@@ -11,9 +11,6 @@ export default class WHQItem extends Item {
   get isEquipped() {
     return this.parent?.system?.equipment.ids.has(this._id) ?? false;
   }
-  get isConsumable() {
-    return this.type === "potion";
-  }
   get isWeapon() {
     return this.type === "weapon";
   }
@@ -140,6 +137,8 @@ export default class WHQItem extends Item {
       case "weapon":
         if (this.isMeleeWeapon) return this._rollMeleeAttack();
         if (this.isRangedWeapon) return this._rollRangedAttack();
+      case "consumable":
+        return this._onUseConsumable();
       default:
         break;
     }
@@ -223,6 +222,37 @@ export default class WHQItem extends Item {
       if (roll.total >= rollData.actor.ballisticSkill) {
         this._rollDamage(target);
       }
+    }
+  }
+
+  async _onUseConsumable() {
+    if (this.type !== "consumable" || !this.actor) return;
+
+    const { uses, autoDestroy, heal, effect } = this.system;
+
+    if (heal.applyHeal) {
+      if (heal.healAll) {
+        await this.actor.applyHeal("all");
+      } else {
+        const r = await Roll.create(
+          heal.formula,
+          this.getRollData()
+        ).evaluate();
+        await this.actor.applyHeal(r.total);
+        r.toMessage({
+          label: `${this.actor.name} roll heal from ${this.name}`,
+        });
+      }
+    }
+    if (effect.applyEffect) {
+      const effects = this.effects.map((ef) => ef.toObject());
+      await this.actor.createEmbeddedDocuments("ActiveEffect", effects);
+    }
+    const newValue = uses.value - 1;
+    await this.update({ "system.uses.value": newValue });
+
+    if (autoDestroy && newValue === 0) {
+      await this.delete();
     }
   }
 }

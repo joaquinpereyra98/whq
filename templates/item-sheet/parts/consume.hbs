@@ -1,0 +1,30 @@
+<section class="tab summary {{tab.cssClass}}" data-group="primary" data-tab="consume">
+    <div class="heal-container">
+        <h3>Healing</h3>
+        <div class="heal-options flex-row">
+            <div class="resource-container flex-col">
+                <label class="whq-label">Apply Heal on Use?</label>
+                {{formInput systemFields.heal.fields.applyHeal value=item.system.heal.applyHeal}}
+            </div>
+            <div class="resource-container flex-col">
+                <label class="whq-label">Cure all Wouds?</label>
+                {{formInput systemFields.heal.fields.healAll value=item.system.heal.healAll disabled=(not
+                item.system.heal.applyHeal)}}
+            </div>
+        </div>
+        <div class="formula-damage-container flex-col">
+            <label class="whq-label">Formula:</label>
+            <input type="text" name="system.heal.formula" value="{{item.system.heal.formula}}" {{disabled
+                disableHealFormula}}>
+        </div>
+    </div>
+    <div class="effect container">
+        <h3>Effects</h3>
+        <div class="effect-options flex-row">
+            <div class="resource-container flex-col">
+                <label class="whq-label">Apply Effects on Use?</label>
+                {{formInput systemFields.effect.fields.applyEffect value=item.system.effect.applyEffect}}
+            </div>
+        </div>
+    </div>
+</section>
