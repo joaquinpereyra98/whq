@@ -1,5 +1,5 @@
 export default {
-    input: "./whq.mjs",
+    input: "./module/whq.mjs",
     output: {
       file: './public/whq.mjs',
       format: 'esm',

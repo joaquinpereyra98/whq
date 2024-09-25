@@ -16,11 +16,11 @@
       "paths": ["css", "lang", "templates"]
     }
   },
-  "url": "",
+  "url": "https://github.com/joaquinpereyra98/whq",
   "license": "LICENSE.txt",
   "readme": "README.md",
-  "bugs": "",
-  "changelog": "",
+  "bugs": "https://github.com/joaquinpereyra98/whq/issues",
+  "changelog": "https://github.com/joaquinpereyra98/whq/releases",
   "media": [
     {
       "type": "setup",
@@ -28,9 +28,9 @@
       "thumbnail": "systems/whq/assets/logos/whqlogo.png"
     }
   ],
-  "version": "3.0.0",
+  "version": "0.0.1",
   "compatibility": {
-    "minimum": "12.328",
+    "minimum": "12",
     "verified": "12.330"
   },
   "esmodules": ["module/whq.mjs"],
@@ -45,8 +45,8 @@
   "packs": [],
   "packFolders": [],
   "socket": false,
-  "manifest": "",
-  "download": "",
+  "manifest": "https://raw.githubusercontent.com/joaquinpereyra98/whq/refs/heads/main/system.json",
+  "download": "https://github.com/joaquinpereyra98/whq/releases/download/v0.3.0/whq.zip",
   "background": "systems/whq/assets/logos/warhammer-quest-card-game.jpg",
   "documentTypes": {
     "Actor": {
