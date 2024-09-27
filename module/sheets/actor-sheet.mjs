@@ -315,17 +315,7 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
    * ---------------------------------------
    */
 
-  /**
-   * Obtain the embedded document from a Uuid, function for make it sync.
-   *
-   * @param {string} uuid  -  The uuid of the element
-   * @returns {Item | ActiveEffect} The embedded Item or ActiveEffect
-   */
-  _getEmbeddedDocument(uuid) {
-    const { embedded } = foundry.utils.parseUuid(uuid);
-    const collectionName = Actor.getCollectionName(embedded[0]);
-    return this.document[collectionName].get(embedded[1]);
-  }
+
   /**
    * Actions performed after any render of the Application.
    * Post-render steps are not awaited by the render process.
@@ -363,10 +353,10 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
    * @param {DragEvent} event       The originating DragEvent
    * @protected
    */
-  _onDragStart(event) {
+  async _onDragStart(event) {
     const docContainer = event.currentTarget.closest(".item-container");
     const docUuid = docContainer?.dataset.doc;
-    const doc = this._getEmbeddedDocument(docUuid);
+    const doc = await fromUuid(docUuid);
 
     const initOnEquip = !!event.currentTarget.closest(".equipment-card");
     const dragData = { ...doc?.toDragData(), initOnEquip };
@@ -770,9 +760,8 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
    */
   static async _onUseDoc(event, target) {
     event.preventDefault();
-    const uuid = target.closest(".item-containers")?.dataset.doc;
+    const uuid = target.closest(".item-container")?.dataset.doc;
     const doc = await fromUuid(uuid);
-
     await doc?.use();
   }
 

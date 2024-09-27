@@ -50,10 +50,12 @@ export default class WHQActor extends Actor {
       return;
     }
     //Make damage a integer positive
-    damage = Math.floor(Math.abs(damage));
-
+    damage = Math.max(damage, 0);
     const actualWounds = this.system.wounds.value;
     const newWounds = Math.max(0, actualWounds - damage);
+    this._displayScrollingTextOnToken(`-${damage} Wounds`, {
+      fill: "#d20000",
+    });
     await this.update({ "system.wounds.value": newWounds });
   }
 
@@ -64,7 +66,6 @@ export default class WHQActor extends Actor {
    */
   async applyHeal(heal, options) {
     const { max, value } = this.system.wounds;
-    console.log(heal)
     if (typeof heal === "string") {
       switch (heal) {
         case "all":
@@ -75,11 +76,45 @@ export default class WHQActor extends Actor {
           break;
       }
     } else if (typeof heal === "number") {
-      //Make damage a integer positive
-      heal = Math.floor(Math.abs(heal));
+      heal = Math.max(heal, 0);
     }
+    this._displayScrollingTextOnToken(`+${heal} Wounds`, {
+      fill: "#009d00",
+      direction: CONST.TEXT_ANCHOR_POINTS.TOP,
+    });
     const newWounds = Math.min(max, value + heal);
-    console.log(newWounds, heal)
     await this.update({ "system.wounds.value": newWounds });
+  }
+  /**
+   *
+   * @param {string} content - The text content to display
+   * @param {object} options - Options which customize the text animation
+   */
+  _displayScrollingTextOnToken(content, options) {
+    const tokens = this.getActiveTokens(true);
+
+    const scrollOptions = foundry.utils.mergeObject(
+      {
+        duration: 2500,
+        anchor: CONST.TEXT_ANCHOR_POINTS.CENTER,
+        direction: CONST.TEXT_ANCHOR_POINTS.BOTTOM,
+        jitter: 0.25,
+        fill: "#d20000",
+        fontSize: 40,
+        fontWeight: "bold",
+        strokeThickness: 3,
+      },
+      options
+    );
+
+    for (const token of tokens) {
+      if (!token.visible || !token.renderable) continue;
+      scrollOptions.distance = token.h * 0.6;
+      canvas.interface.createScrollingText(
+        token.center,
+        content,
+        scrollOptions
+      );
+    }
   }
 }

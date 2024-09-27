@@ -1,0 +1,31 @@
+<div class="whq chat-card item-card" data-actor-id="{{ actor.id }}" data-item-uuid="{{ item.uuid }}">
+    <section class="card-header description">
+        <header class="summary flex-row">
+            <img class="item-icon" src="{{ item.img }}" alt="{{ item.name }}">
+            <div class="name-stacked border">
+                <h1 class="title">{{ item.name }}</h1>
+                <span class="subtitle"> {{subtitle}}</span>
+            </div>
+        </header>
+    </section>
+    {{#if showDescription}}
+    <section class="card-description">
+        <div class="description-content">
+            {{{itemDescription}}}
+        </div>
+    </section>
+    {{/if}}
+    <section class="card-actions">
+        {{#if isAttack}}
+        {{#each targets as |target|}}
+        <div class="button-container">
+            Roll Damage against <b>{{target.name}}:</b>
+            <button class="item-action-button" data-action="damage" data-target-uuid="{{target.uuid}}" {{disabled (not target.hit) }}>
+                <i class="fa-solid fa-swords"></i>
+                {{ifThen target.hit "Hit" "Fail" }}
+            </button>
+        </div>
+        {{/each}}
+        {{/if}}
+    </section>
+</div>

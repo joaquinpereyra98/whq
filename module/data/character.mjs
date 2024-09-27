@@ -126,7 +126,7 @@ export default class WHQCharacter extends foundry.abstract.TypeDataModel {
   getRollData() {
     const data = foundry.utils.deepClone(this);
     Object.keys(this.attributes).forEach((attrKey) => {
-      data[attrKey] = this.attributes[attrKey].total;
+      data[attrKey] = this.attributes[attrKey].value;
     });
     return data;
   }

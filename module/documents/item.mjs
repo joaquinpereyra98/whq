@@ -1,3 +1,5 @@
+import Roll from "../../foundry/client-esm/dice/roll.mjs";
+
 export default class WHQItem extends Item {
   /**
    * ---------------------------------------
@@ -60,8 +62,8 @@ export default class WHQItem extends Item {
         name,
         img,
         uuid,
-        toughness: system?.attributes?.toughness?.total || 0,
-        weaponSkill: system?.attributes?.weaponSkill?.total || 0,
+        toughness: system?.attributes?.toughness.value || 0,
+        weaponSkill: system?.attributes?.weaponSkill.value || 0,
       };
     });
   }
@@ -71,6 +73,36 @@ export default class WHQItem extends Item {
    */
   static getDefaultArtwork(itemData) {
     return { img: this.DEFAULT_ICON };
+  }
+  /**
+   *
+   * @param {ChatMessage} message
+   * @param {JQuery} $html
+   * @param {import("../../foundry/common/types.mjs").ChatMessageData} messageData
+   */
+  static addChatListener(message, $html, messageData) {
+    const button = $html[0].querySelector(".item-action-button");
+    if (!button) return;
+    button.addEventListener("click", async (event) => {
+      const { itemUuid } = event.currentTarget.closest(
+        ".chat-card.item-card"
+      )?.dataset;
+      const item = await fromUuid(itemUuid);
+      const { action, targetUuid } = event.currentTarget.dataset;
+
+      if (!action || !item) return;
+
+      switch (action) {
+        case "damage":
+          const target = await fromUuid(targetUuid);
+          if (target) return item._rollDamage(target);
+
+          break;
+
+        default:
+          break;
+      }
+    });
   }
 
   /**
@@ -147,20 +179,20 @@ export default class WHQItem extends Item {
   /**
    * Rolls damage with optional strength modifier and target's toughness deduction.
    *
-   * @param {TargetDescriptor} target - The actor being targeted in the roll, providing toughness for the deduction.
+   * @param {Actor} target - The actor being targeted in the roll, providing toughness for the deduction.
    * @returns {Promise<void>} - Sends the evaluated roll message to the chat.
    */
   async _rollDamage(target) {
     const rollData = this.getRollData();
-    rollData.target = target;
+    rollData.target = target.getRollData();
 
     const formula = this.getDamageFormula();
 
     const rollDamage = await Roll.create(formula, rollData).evaluate();
-    await rollDamage.toMessage({ flavor: "Roll Damage" });
-
-    const actor = await fromUuid(target.uuid);
-    await actor.applyDamage(rollDamage.total);
+    this._renderItemChat(rollDamage, `Roll Damage against ${target.name}`, {
+      hideDescriptions: true,
+    });
+    await target.applyDamage(rollDamage.total);
   }
 
   /**
@@ -172,8 +204,6 @@ export default class WHQItem extends Item {
    * @returns {Promise<void>} - Resolves after rolling attacks and possibly applying damage.
    */
   async _rollMeleeAttack() {
-    const combatTable = this.actor.getCombatTable();
-
     if (game.user.targets.size === 0) {
       console.warn(
         "No targets selected. Please select one or more targets to attack."
@@ -185,14 +215,16 @@ export default class WHQItem extends Item {
       "1d6 + @actor.weaponSkill",
       this.getRollData()
     ).evaluate();
-    await roll.toMessage({ flavor: "Roll Melee Attack" });
+    ``;
+    const targets = this.constructor._formatAttackTargets().map((target) => ({
+      ...target,
+      hit: roll.total >= this.actor?.getCombatTable()[target.weaponSkill - 1],
+    }));
 
-    const targets = this.constructor._formatAttackTargets();
-    for (const target of targets) {
-      if (roll.total >= combatTable[target.weaponSkill - 1]) {
-        this._rollDamage(target);
-      }
-    }
+    return this._renderItemChat(roll, "Roll Melee Attack", {
+      isAttack: true,
+      targets,
+    });
   }
 
   /**
@@ -214,15 +246,16 @@ export default class WHQItem extends Item {
     }
 
     const roll = await Roll.create("1d6", rollData).evaluate();
-    await roll.toMessage({ flavor: "Roll Ranged Attack" });
 
-    const targets = this.constructor._formatAttackTargets();
+    const targets = this.constructor._formatAttackTargets().map((target) => ({
+      ...target,
+      hit: roll.total >= rollData.actor.ballisticSkill,
+    }));
 
-    for (const target of targets) {
-      if (roll.total >= rollData.actor.ballisticSkill) {
-        this._rollDamage(target);
-      }
-    }
+    return this._renderItemChat(roll, "Roll Ranged Attack", {
+      isAttack: true,
+      targets,
+    });
   }
 
   async _onUseConsumable() {
@@ -254,5 +287,56 @@ export default class WHQItem extends Item {
     if (autoDestroy && newValue === 0) {
       await this.delete();
     }
+  }
+  /**
+   * Display the chat card for an Item as a Chat Message
+   * @param {Roll} roll
+   * @param {String} flavor
+   * @param {Object} options
+   * @param {Boolean} options.isAttack
+   * @param {TargetDescriptor[]} options.targets
+   * @param {Boolean} options.hideDescriptions
+   * @returns {ChatMessage}
+   */
+  async _renderItemChat(roll = null, flavor = undefined, options = {}) {
+    const context = {
+      actor: this.actor,
+      item: this,
+      itemDescription: await TextEditor.enrichHTML(
+        this.system.description ?? "",
+        {
+          rollData: this.getRollData(),
+          relativeTo: this.parent,
+        }
+      ),
+      subtitle: `${this.system.type?.capitalize()} ${this.type.capitalize()}`,
+      isAttack: options.isAttack,
+      roll,
+      showDescription: !options.hideDescriptions,
+      targets: options.isAttack ? options.targets : null
+    };
+
+    const html = await renderTemplate(
+      "systems/whq/templates/chat/item-card.hbs",
+      context
+    );
+    const rollContent = await roll.render();
+
+    const msgConfig = {
+      content: `${html} ${rollContent}`,
+      flags: {
+        "whq.item": { id: this.id, uuid: this.uuid, type: this.type },
+      },
+      speaker: ChatMessage.getSpeaker({
+        actor: this.actor,
+        token: this.actor.token,
+      }),
+      rolls: [roll],
+      flavor,
+    };
+
+    ChatMessage.applyRollMode(msgConfig, game.settings.get("core", "rollMode"));
+
+    return ChatMessage.implementation.create(msgConfig);
   }
 }

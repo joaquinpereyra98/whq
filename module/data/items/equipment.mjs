@@ -21,7 +21,6 @@ export default class WHQEquipment extends foundry.abstract.TypeDataModel {
         min: 0,
       }),
 
-      //Combat
       type: new StringField({
         choices: CONFIG.WHQ.equipmentTypes,
       }),

@@ -425,3 +425,31 @@
 .whq .active-effect-element .button-panel a {
     margin: 0 2px;
 }
+
+.whq.chat-card .item-icon {
+    border-image-source: url(../assets/ui/inventory_frame.png);
+    border-image-slice: 6 6 6 6 fill;
+    border-width: 5px;
+    width: 3rem;
+    height: 3rem;
+}
+
+.whq.chat-card .name-stacked {
+    margin: 0 0.5em;
+}
+
+.whq.chat-card .name-stacked .title {
+    margin: 0;
+}
+
+.whq.chat-card .button-container {
+    margin: 5px 0;
+}
+
+.whq.chat-card .button-container button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: larger;
+    font-family: var(--whq-font-label);
+}
