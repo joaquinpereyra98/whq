@@ -1,5 +1,3 @@
-import Roll from "../../foundry/client-esm/dice/roll.mjs";
-
 export default class WHQItem extends Item {
   /**
    * ---------------------------------------
