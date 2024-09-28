@@ -6,7 +6,7 @@ export default class WHQConsumable extends foundry.abstract.TypeDataModel {
    * @returns { import("../../../foundry/common/abstract/data.mjs").DataSchema }
    */
   static defineSchema() {
-    const { NumberField, BooleanField, HTMLField, SchemaField } =
+    const { NumberField, BooleanField, HTMLField, SchemaField, StringField } =
       foundry.data.fields;
 
     return {
@@ -45,8 +45,13 @@ export default class WHQConsumable extends foundry.abstract.TypeDataModel {
           trim: true,
           deterministic: false
         })
-      })
+      }),
 
+      onBackpack: new BooleanField({ required: true }),
+
+      origin: new StringField({
+        choices: CONFIG.WHQ.originOption,
+      }),
     };
   }
 }

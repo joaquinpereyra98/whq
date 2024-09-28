@@ -18,6 +18,10 @@
     --whq-font-label: 'Newtext Rg BT Regular';
 }
 
+.whq .clickable {
+    cursor: pointer;
+}
+
 .whq .flex-col {
     display: flex;
     flex-direction: column;
@@ -75,6 +79,10 @@
 
 /*=========================== GENERAL ELEMENTS ============================*/
 
+.application.whq nav.tabs {
+    overflow-x: auto;
+    gap: 0;
+}
 .whq h1,
 .whq h2,
 .whq h3 {
@@ -452,4 +460,38 @@
     justify-content: center;
     font-size: larger;
     font-family: var(--whq-font-label);
+}
+
+.whq .item-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+
+    .item {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .item .img {
+        flex: 0 0 30px;
+        max-width: 15%;
+        border-color: var(--button-border-color);
+        border-style: outset;
+        border-width: 2px;
+        margin-right: 2px;
+    }
+
+    .item .whq-label {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .item .action-button {
+        opacity: 1;
+    }
+    .item .action-button:hover {
+        transform: scale(1.3);
+    }
 }

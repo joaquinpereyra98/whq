@@ -4,7 +4,7 @@ export default class WHQEquipment extends foundry.abstract.TypeDataModel {
    * @returns { import("../../../foundry/common/abstract/data.mjs").DataSchema }
    */
   static defineSchema() {
-    const { NumberField, StringField, HTMLField } =
+    const { NumberField, StringField, HTMLField, BooleanField } =
       foundry.data.fields;
 
     return {
@@ -25,6 +25,11 @@ export default class WHQEquipment extends foundry.abstract.TypeDataModel {
         choices: CONFIG.WHQ.equipmentTypes,
       }),
 
+      onBackpack: new BooleanField({ required: true }),
+
+      origin: new StringField({
+        choices: CONFIG.WHQ.originOption,
+      }),
     };
   }
 }

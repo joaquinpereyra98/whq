@@ -32,11 +32,12 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
       deleteDoc: this._onDeleteDoc,
       useDoc: this._onUseDoc,
       editDoc: this._onEditDoc,
+      toggleDoc: this._onToggleDoc,
       initWounds: this._onInitWounds,
       createEffect: this._onCreateEffect,
       ableEffect: this._onAbleEffect,
       deleteEffect: this._onDeleteEffect,
-      editEffect: this._onEditEffect
+      editEffect: this._onEditEffect,
     },
     form: { submitOnChange: true },
     window: {
@@ -65,7 +66,11 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
       template: "templates/generic/tab-navigation.hbs",
       classes: ["body-part"],
     },
-    //Summary Tab
+    //Tabs
+    backpack: {
+      template: CONSTANT.actorParts("tabs/backpack-tab.hbs"),
+      classes: ["body-part"],
+    },
     weapons: {
       template: CONSTANT.actorParts("weapons-part.hbs"),
       classes: ["body-part"],
@@ -94,6 +99,12 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
    */
   static TABS = [
     {
+      id: "backpack",
+      group: "primary",
+      icon: "fa-solid fa-backpack",
+      label: "WHQ.TABS.ACTORS.Backpack",
+    },
+    {
       id: "weapons",
       group: "primary",
       icon: "fa-solid fa-sword",
@@ -108,7 +119,7 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
     {
       id: "equipments",
       group: "primary",
-      icon: "fa-solid fa-backpack",
+      icon: "fa-solid fa-ring-diamond",
       label: "WHQ.TABS.ACTORS.Equipments",
     },
     {
@@ -136,7 +147,7 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
    *  @override
    */
   tabGroups = {
-    primary: "weapons",
+    primary: "backpack",
   };
 
   /**
@@ -198,23 +209,39 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
     switch (partId) {
       case "weapons":
         context.tab = context.tabs.weapons;
-        context.items = this.actor.itemTypes.weapon;
+        context.items = {
+          tresures: this.actor.itemTypes.weapon.filter(i => i.system.origin === 'treasure'),
+          general: this.actor.itemTypes.weapon.filter(i => i.system.origin !== 'treasure'),
+        };
         break;
       case "armors":
         context.tab = context.tabs.armors;
-        context.items = this.actor.itemTypes.armor;
+        context.items = {
+          tresures: this.actor.itemTypes.armor.filter(i => i.system.origin === 'treasure'),
+          general: this.actor.itemTypes.armor.filter(i => i.system.origin !== 'treasure'),
+        };
         break;
       case "equipments":
         context.tab = context.tabs.equipments;
-        context.items = this.actor.itemTypes.equipment;
+        context.items = {
+          tresures: this.actor.itemTypes.equipment.filter(i => i.system.origin === 'treasure'),
+          general: this.actor.itemTypes.equipment.filter(i => i.system.origin !== 'treasure'),
+        };
         break;
       case "consumables":
         context.tab = context.tabs.consumables;
-        context.items = this.actor.itemTypes.consumable;
+        context.items = {
+          tresures: this.actor.itemTypes.consumable.filter(i => i.system.origin === 'treasure'),
+          general: this.actor.itemTypes.consumable.filter(i => i.system.origin !== 'treasure'),
+        };
         break;
       case "effects":
         context.tab = context.tabs.effects;
         context.effects = prepareActiveEffectCategories(this.document.effects);
+        break;
+      case "backpack":
+        context.tab = context.tabs.backpack;
+        this._prepareBackpack(context);
         break;
       case "equipment":
         context.slh = CONFIG.WHQ.silhouette;
@@ -249,6 +276,14 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
 
     context.ringSlots = mapSlots(ringsParts);
     context.otherSlots = mapSlots(otherParts);
+  }
+
+  _prepareBackpack(context) {
+    const items = this.actor.items;
+    context.items = {
+      backpack: items.filter((i) => i.system.onBackpack).sort((a,b)=> a.name > b.name ? 1 : -1),
+      general: items.filter((i) => !i.system.onBackpack).sort((a,b)=> a.name > b.name ? 1 : -1),
+    };
   }
 
   /**
@@ -314,7 +349,6 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
    * 4. Drag n Drop
    * ---------------------------------------
    */
-
 
   /**
    * Actions performed after any render of the Application.
@@ -760,7 +794,7 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
    */
   static async _onUseDoc(event, target) {
     event.preventDefault();
-    const uuid = target.closest(".item-container")?.dataset.doc;
+    const uuid = target.closest('[data-doc]')?.dataset.doc;
     const doc = await fromUuid(uuid);
     await doc?.use();
   }
@@ -772,9 +806,9 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
    */
   static async _onDeleteDoc(event, target) {
     event.preventDefault();
-    const uuid = target.closest(".item-container")?.dataset.doc;
+    const uuid = target.closest('[data-doc]')?.dataset.doc;
     const doc = await fromUuid(uuid);
-
+    if(!doc)return;
     await doc.delete();
   }
 
@@ -785,9 +819,21 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
    */
   static async _onEditDoc(event, target) {
     event.preventDefault();
-    const uuid = target.closest(".item-container")?.dataset.doc;
+    const uuid = target.closest('[data-doc]')?.dataset.doc;
     const doc = await fromUuid(uuid);
+    if(!doc)return;
     doc.sheet.render(true);
+  }
+
+  static async _onToggleDoc(event, target) {
+    event.preventDefault();
+    const uuid = target.closest('[data-doc]')?.dataset.doc;
+    const prop = target.dataset.prop;
+    const doc = await fromUuid(uuid);
+
+    if (!doc || !prop) return;
+
+    await doc.update({[`system.${prop}`]: !foundry.utils.getProperty(doc, `system.${prop}`)});
   }
   /**
    * Handle creating a new Owned Item or ActiveEffect for the actor using initial data defined in the HTML dataset
@@ -807,7 +853,6 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
       disabled: type === "inactive",
       img: "icons/svg/aura.svg",
     };
-    console.log(effectData)
     await aeCls.create(effectData, { parent: this.document });
   }
   /**
@@ -837,9 +882,9 @@ export default class WHQActorSheet extends api.HandlebarsApplicationMixin(
 
   static async _onAbleEffect(event, target) {
     event.preventDefault();
-    
+
     const uuid = target.closest(".button-panel")?.dataset.doc;
     const doc = await fromUuid(uuid);
-    await doc.update({disabled: !doc.disabled});
+    await doc.update({ disabled: !doc.disabled });
   }
 }

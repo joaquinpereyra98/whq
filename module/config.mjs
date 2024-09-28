@@ -111,4 +111,10 @@ WHQ.equipmentTypes = {
   amulet: "Amulet"
 }
 
+WHQ.originOption = {
+  initial: "Initial",
+  treasure: "Treasure",
+  settlement: "Settlement"
+}
+
 export default WHQ;

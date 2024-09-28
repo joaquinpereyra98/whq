@@ -1,0 +1,36 @@
+<section class="tab summary {{tab.cssClass}}" data-group="primary" data-tab="backpack">
+    <div class="tab-content flex-row">
+        <div class="general-container flex-1">
+            <h3>General Equipment</h3>
+            <div class="item-list">
+                {{#each items.general as |item|}}
+                <div class="item flexrow" data-doc="{{item.uuid}}">
+                    <img class="img clickable" src="{{item.img}}" alt="{{item.name}}" data-action="editDoc">
+                    <span class="whq-label  flex-4">{{item.name}}</span>
+                    <div class="items-button flex-col">
+                        <a class="action-button doc-button" data-action="toggleDoc" data-prop="onBackpack">
+                            <i class="fa-light fa-backpack"></i>
+                        </a>
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+        </div>
+        <div class="backpack-container flex-1">
+            <h3>Backpack</h3>
+            <div class="item-list">
+                {{#each items.backpack as |item|}}
+                <div class="item flexrow" data-doc="{{item.uuid}}">
+                    <img class="img clickable" src="{{item.img}}" alt="{{item.name}}" data-action="editDoc">
+                    <span class="whq-label  flex-4">{{item.name}}</span>
+                    <div class="items-button flex-col">
+                        <a class="action-button doc-button" data-action="toggleDoc" data-prop="onBackpack">
+                            <i class="fa-solid fa-backpack"></i>
+                        </a>
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+        </div>
+    </div>
+</section>

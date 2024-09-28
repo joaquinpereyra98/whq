@@ -23,10 +23,10 @@ export default class WHQWeapon extends foundry.abstract.TypeDataModel {
       }),
 
       attributes: new SchemaField({
-        strength: new NumberField({integer: true, required: false})
+        strength: new NumberField({ integer: true, required: false }),
       }),
 
-      equipped: new BooleanField({ required: true }),
+      onBackpack: new BooleanField({ required: true }),
 
       type: new StringField({
         choices: CONFIG.WHQ.weaponTypes,
@@ -39,8 +39,12 @@ export default class WHQWeapon extends foundry.abstract.TypeDataModel {
           required: false,
           initial: "",
           trim: true,
-          deterministic: false
+          deterministic: false,
         }),
+      }),
+
+      origin: new StringField({
+        choices: CONFIG.WHQ.originOption,
       }),
     };
   }
