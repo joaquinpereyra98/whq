@@ -1,3 +1,5 @@
+import CONSTANT from "../constants.mjs";
+
 export default class WHQItem extends Item {
   /**
    * ---------------------------------------
@@ -72,6 +74,7 @@ export default class WHQItem extends Item {
   static getDefaultArtwork(itemData) {
     return { img: this.DEFAULT_ICON };
   }
+  
   /**
    *
    * @param {ChatMessage} message
@@ -190,7 +193,14 @@ export default class WHQItem extends Item {
     this._renderItemChat(rollDamage, `Roll Damage against ${target.name}`, {
       hideDescriptions: true,
     });
-    await target.applyDamage(rollDamage.total);
+    if (game.user.isGM) {
+      await target.applyDamage(rollDamage.total);
+    } else {
+      game.system.socket.emitForGM(CONSTANT.socketTypes.applyDamage, {
+        actorUuid: target.uuid,
+        damage: rollDamage.total
+      })
+    }
   }
 
   /**
@@ -210,13 +220,13 @@ export default class WHQItem extends Item {
     }
 
     const roll = await Roll.create(
-      "1d6 + @actor.weaponSkill",
+      "1d6",
       this.getRollData()
     ).evaluate();
-    ``;
+    
     const targets = this.constructor._formatAttackTargets().map((target) => ({
       ...target,
-      hit: roll.total >= this.actor?.getCombatTable()[target.weaponSkill - 1],
+      hit: roll.total >= this.actor?.getToHitValue(this.actor.system?.weaponSkill, target.weaponSkill),
     }));
 
     return this._renderItemChat(roll, "Roll Melee Attack", {

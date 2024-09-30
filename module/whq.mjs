@@ -3,6 +3,7 @@ import * as docs from "./documents/_module.mjs";
 import * as sheets from "./sheets/_module.mjs";
 import WHQ from "./config.mjs";
 import { createWHQMacro } from './documents/macro.mjs';
+import WHQSocket from './socket.mjs';
 
 Hooks.on("init", () => {
   CONFIG.WHQ = WHQ;
@@ -35,6 +36,8 @@ Hooks.on("init", () => {
     makeDefault: true,
     label: "WHQ.SheetLabels.Item",
   });
+
+  game.system.socket = new WHQSocket();
 });
 
 Hooks.on("hotbarDrop", (bar, data, slot) => {

@@ -278,7 +278,7 @@
 .equipment-card .equip-slot {
     border-image-source: url(../assets/ui/inventory_frame.png);
     border-image-slice: 6 6 6 6 fill;
-    border-image-outset: 2px;
+    border-image-outset: 0px;
 }
 
 .equipment-card .silhouette-frame .equip-slot {

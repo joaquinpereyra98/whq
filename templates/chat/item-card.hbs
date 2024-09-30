@@ -19,7 +19,7 @@
         {{#if isAttack}}
         {{#each targets as |target|}}
         <div class="button-container">
-            Roll Damage against <b>{{target.name}}:</b>
+            Attack against <b>{{target.name}}:</b>
             <button class="item-action-button" data-action="damage" data-target-uuid="{{target.uuid}}" {{disabled (not target.hit) }}>
                 <i class="fa-solid fa-swords"></i>
                 {{ifThen target.hit "Hit" "Fail" }}

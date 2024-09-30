@@ -5,6 +5,46 @@
 export default class WHQActor extends Actor {
   /* --------------------------------------------- */
 
+  /**
+   * Perform follow-up operations after a Document of this type is updated.
+   * Post-update operations occur for all clients after the update is broadcast.
+   * @param {object} changed            The differential data that was changed relative to the documents prior values
+   * @param {object} options            Additional options which modify the update request
+   * @param {string} userId             The id of the User requesting the document update
+   * @see {Document#_onUpdate}
+   * @protected
+   */
+  _onUpdate(changed, options, userId) {
+    super._onUpdate(changed,options,userId);
+
+    if (changed.system.wounds.value && options.whq.wounds) {
+
+      if (options.whq.wounds > 0) {
+        this._displayScrollingTextOnToken(`+${options.whq.wounds} Wounds`, {
+          fill: "#009d00",
+          direction: CONST.TEXT_ANCHOR_POINTS.TOP,
+        });
+      } else if (options.whq.wounds < 0) {
+        this._displayScrollingTextOnToken(`-${options.whq.wounds} Wounds`, {
+          fill: "#d20000",
+        });
+      }
+    }
+  }
+  /** @inheritDoc */
+  async _preUpdate(changes, options, user) {
+    if ((await super._preUpdate(changes, options, user)) === false)
+      return false;
+
+    if (changes.system?.wounds?.value) {
+      const current = this.system.wounds.value;
+      const delta = changes.system?.wounds?.value - current;
+      if (delta !== 0) {
+        foundry.utils.setProperty(options, "whq.wounds", delta);
+      }
+    }
+  }
+
   /** @inheritDoc */
   prepareEmbeddedDocuments() {
     super.prepareEmbeddedDocuments();
@@ -33,8 +73,27 @@ export default class WHQActor extends Actor {
     await r.toMessage({ flavor });
   }
 
-  getCombatTable() {
-    return [2, 3, 3, 4, 4, 4, 4, 4, 5, 5];
+  /**
+   *
+   * @param {Number} wsa - Weapon Skill's Attacker, number must be between 1 and 10
+   * @param {Number} wse - Weapon Skill's Attacker, number must be between 1 and 10
+   * @returns
+   */
+  getToHitValue(wsa, wse) {
+    if (wsa < 1 || wsa > 10 || wse < 1 || wse > 10)
+      throw new Error("Weapon Skills must be between 1 and 10.");
+
+    if (wsa < wse / 2) {
+      return 2;
+    } else if (wsa < wse) {
+      return 3;
+    } else if (wsa <= wse * 2) {
+      return 4;
+    } else if (wsa <= wse * 3) {
+      return 5;
+    } else {
+      return 6;
+    }
   }
 
   /**
@@ -53,9 +112,7 @@ export default class WHQActor extends Actor {
     damage = Math.max(damage, 0);
     const actualWounds = this.system.wounds.value;
     const newWounds = Math.max(0, actualWounds - damage);
-    this._displayScrollingTextOnToken(`-${damage} Wounds`, {
-      fill: "#d20000",
-    });
+
     await this.update({ "system.wounds.value": newWounds });
   }
 
@@ -78,10 +135,6 @@ export default class WHQActor extends Actor {
     } else if (typeof heal === "number") {
       heal = Math.max(heal, 0);
     }
-    this._displayScrollingTextOnToken(`+${heal} Wounds`, {
-      fill: "#009d00",
-      direction: CONST.TEXT_ANCHOR_POINTS.TOP,
-    });
     const newWounds = Math.min(max, value + heal);
     await this.update({ "system.wounds.value": newWounds });
   }

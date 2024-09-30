@@ -44,7 +44,7 @@
   ],
   "packs": [],
   "packFolders": [],
-  "socket": false,
+  "socket": true,
   "manifest": "#{MANIFEST}#",
   "download": "#{DOWNLOAD}#",
   "background": "systems/whq/assets/logos/warhammer-quest-card-game.jpg",
